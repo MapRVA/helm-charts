@@ -8,7 +8,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: db-migrator
-          image: ghcr.io/hotosm/tasking-manager/backend:main
+          image: {{ .Values.backend.image }}
           command:
             ["alembic", "-c", "migrations/alembic.ini", "upgrade", "head"]
           env:
