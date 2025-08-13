@@ -1,6 +1,3 @@
-backendReplicaCount: 1
-frontendReplicaCount: 1
-
 baseUrl: <BASE URL>
 apiUrl: <API URL>
 secret: <SECRET HERE>
@@ -49,3 +46,11 @@ settings:
   mapperLevelAdvanced: "500"
   importMaxFilesize: "1000000"
   maxAoiArea: "5000"
+
+frontend:
+  replicaCount: 1
+  imagePullPolicy: IfNotPresent
+
+backend:
+  replicaCount: 1
+  imagePullPolicy: IfNotPresent

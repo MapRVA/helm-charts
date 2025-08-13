@@ -17,7 +17,7 @@ spec:
         - name: tm-api
           image: ghcr.io/maprva/backend:develop
           tty: true
-          imagePullPolicy: Always
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
           command: [ "sleep", "infinity" ]
           env:
             - name: TM_APP_BASE_URL
