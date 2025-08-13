@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: tm-db-migration
 spec:
+  ttlSecondsAfterFinished: 21600 # six hours
   template:
     spec:
       restartPolicy: Never
