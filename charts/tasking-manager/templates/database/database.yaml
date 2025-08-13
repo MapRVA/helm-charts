@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: tasking-manager-db
+  namespace: {{ .Release.Namespace }}
+spec:
+  instances: 1 # increase for production?
+  imageName: ghcr.io/cloudnative-pg/postgis:14-3.5
+  bootstrap:
+    initdb:
+      database: tasking-manager
+      owner: tm
+      secret:
+        name: tasking-manager-db
+      postInitTemplateSQL:
+        - CREATE EXTENSION postgis;
+        - CREATE EXTENSION postgis_topology;
+        - CREATE EXTENSION fuzzystrmatch;
+        - CREATE EXTENSION postgis_tiger_geocoder;
+  storage:
+    storageClass: nfs-csi
+    size: 5Gi

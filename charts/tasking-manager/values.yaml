@@ -1,0 +1,51 @@
+backendReplicaCount: 1
+frontendReplicaCount: 1
+
+baseUrl: <BASE URL>
+apiUrl: <API URL>
+secret: <SECRET HERE>
+
+org:
+  name: <NAME OF ORG>
+  code: <ORG CODE>
+  url: <ORG URL>
+  logoUrl: https://cdn.img.url/logo.png
+  github: <GITHUB URL>
+
+oAuth2:
+  clientId: <CLIENT ID>
+  clientSecret: <CLIENT SECRET>
+  redirectUri: <REDIRECT URI>
+  scope: read_prefs write_api
+
+osm:
+  serverUrl: https://www.openstreetmap.org
+  serverApiUrl: https://api.openstreetmap.org
+  nominatimServerUrl: https://nominatim.openstreetmap.org
+  registerUrl: https://www.openstreetmap.org/user/new
+  idEditorUrl: https://www.openstreetmap.org/user/new
+  potlatch2EditorUrl: https://www.openstreetmap.org/edit?editor=potlatch2
+  rapidEditorUrl: https://mapwith.ai/rapid
+
+ohsome:
+  baseUrl: https://stats.now.ohsome.org
+  apiUrl: https://stats.now.ohsome.org/api
+  apiToken: <API TOKEN HERE>
+  topics: highway,waterway,building,poi
+
+email:
+  smtpHost: smtp.gmail.com
+  smtpPort: "587"
+  smtpUser: <EMAIL HERE>
+  smtpPassword: <PASSWORD HERE>
+  smtpUseTls: "0"
+  smtpUseSsl: "1"
+  sendProjectEmailUpdates: "-1"
+
+settings:
+  defaultLocale: en
+  taskUnlockAfter: 2h
+  mapperLevelIntermediate: "250"
+  mapperLevelAdvanced: "500"
+  importMaxFilesize: "1000000"
+  maxAoiArea: "5000"
