@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tm-api
-          image: ghcr.io/maprva/backend:develop
+          image: {{ .Values.backend.image }}
           tty: true
           imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
           command: ["uvicorn", "backend.main:api", "--host", "0.0.0.0", "--port", "5000" ]

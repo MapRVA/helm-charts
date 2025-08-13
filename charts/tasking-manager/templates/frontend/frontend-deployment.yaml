@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tm-frontend
-          image: ghcr.io/maprva/frontend:develop
+          image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
           env:
           - name: TM_APP_BASE_URL
