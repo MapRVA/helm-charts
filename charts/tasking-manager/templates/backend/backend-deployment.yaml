@@ -18,7 +18,7 @@ spec:
           image: ghcr.io/maprva/backend:develop
           tty: true
           imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
-          command: [ "sleep", "infinity" ]
+          command: ["uvicorn", "backend.main:api", "--host", "0.0.0.0", "--port", "5000" ]
           env:
             - name: TM_APP_BASE_URL
               value: {{ .Values.baseUrl }}
