@@ -4,7 +4,7 @@ metadata:
   name: tasking-manager-db
   namespace: {{ .Release.Namespace }}
   annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook": pre-install
 spec:
   instances: 1 # increase for production?
   imageName: ghcr.io/cloudnative-pg/postgis:14-3.5
