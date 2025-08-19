@@ -48,11 +48,11 @@ settings:
   maxAoiArea: "5000"
 
 frontend:
-  image: ghcr.io/maprva/frontend:08714b3
+  image: ghcr.io/maprva/frontend:9abf3d3
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
 backend:
-  image: ghcr.io/maprva/backend:08714b3
+  image: ghcr.io/maprva/backend:9abf3d3
   replicaCount: 1
   imagePullPolicy: IfNotPresent
