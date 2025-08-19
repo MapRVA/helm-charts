@@ -3,6 +3,16 @@ entries:
   tasking-manager:
   - apiVersion: v2
     appVersion: 5.1.1
+    created: "2025-08-19T08:17:49.228145322Z"
+    description: A Helm chart for deploying the HOT Tasking Manager to Kubernetes.
+    digest: d41bb120e2984995c72f56ab5e4b8fd24246f01d73d24ba5d6ddfe40663a2970
+    name: tasking-manager
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/tasking-manager-0.2.7/tasking-manager-0.2.7.tgz
+    version: 0.2.7
+  - apiVersion: v2
+    appVersion: 5.1.1
     created: "2025-08-19T07:15:47.49684349Z"
     description: A Helm chart for deploying the HOT Tasking Manager to Kubernetes.
     digest: 2aa0f77aaf4c99237f82865dd62b3711e45c0db9b3e3890a2d06377d8936b441
@@ -91,4 +101,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/tasking-manager-0.1.0/tasking-manager-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-19T07:15:47.496887172Z"
+generated: "2025-08-19T08:17:49.228186288Z"
