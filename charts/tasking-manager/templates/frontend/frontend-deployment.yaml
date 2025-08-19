@@ -30,7 +30,7 @@ spec:
             value: {{ .Values.org.url }}
           - name: TM_ORG_GITHUB
             value: {{ .Values.org.github }}
-          - name: TM_APP_API_URL
+          - name: REACT_APP_API_URL
             value: {{ .Values.apiUrl }}
           - name: TM_APP_API_VERSION
             value: v2
