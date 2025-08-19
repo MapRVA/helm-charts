@@ -18,89 +18,89 @@ spec:
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
           env:
-          - name: TM_APP_BASE_URL
-            value: {{ .Values.baseUrl }}
-          - name: TM_ORG_NAME
-            value: {{ .Values.org.name }}
-          - name: TM_ORG_CODE
-            value: {{ .Values.org.code }}
-          - name: TM_ORG_LOGO
-            value: {{ .Values.org.logoUrl }}
-          - name: TM_ORG_URL
-            value: {{ .Values.org.url }}
-          - name: TM_ORG_GITHUB
-            value: {{ .Values.org.github }}
-          - name: REACT_APP_API_URL
-            value: {{ .Values.apiUrl }}
-          - name: TM_APP_API_VERSION
-            value: v2
-          - name: OSM_SERVER_URL
-            value: {{ .Values.osm.serverUrl }}
-          - name: OSM_SERVER_API_URL
-            value: {{ .Values.osm.serverApiUrl }}
-          - name: OSM_NOMINATIM_SERVER_URL
-            value: {{ .Values.osm.nominatimServerUrl }}
-          - name: OSM_REGISTER_URL
-            value: {{ .Values.osm.registerUrl }}
-          - name: ID_EDITOR_URL
-            value: {{ .Values.osm.idEditorUrl }}
-          - name: POTLATCH2_EDITOR_URL
-            value: {{ .Values.osm.potlatch2EditorUrl }}
-          - name: RAPID_EDITOR_URL
-            value: {{ .Values.osm.rapidEditorUrl }}
-          - name: OHSOME_STATS_BASE_URL
-            value: {{ .Values.ohsome.baseUrl }}
-          - name: OHSOME_STATS_API_URL
-            value: {{ .Values.ohsome.apiUrl }}
-          - name: OHSOME_STATS_TOKEN
-            value: {{ .Values.ohsome.apiToken }}
-          - name: OHSOME_STATS_TOPICS
-            value: {{ .Values.ohsome.topics }}
-          - name: TM_SECRET
-            value: {{ .Values.secret }}
-          - name: TM_CLIENT_ID
-            value: {{ .Values.oAuth2.clientId }}
-          - name: TM_CLIENT_SECRET
-            value: {{ .Values.oAuth2.clientSecret }}
-          - name: TM_REDIRECT_URI
-            value: {{ .Values.oAuth2.redirectUri }}
-          - name: TM_SCOPE
-            value: {{ .Values.oAuth2.scope }}
-          - name: POSTGRES_DB
-            value: tasking-manager
-          - name: POSTGRES_USER
-            value: tm
-          - name: POSTGRES_PASSWORD
-            value: tm
-          - name: POSTGRES_ENDPOINT
-            value: "tasking-manager-db-rw.{{ .Release.Namespace }}.svc.cluster.local"
-          - name: POSTGRES_PORT
-            value: "5432"
-          - name: POSTGRES_TEST_DB
-            value: taskingmanagertest
-          - name: TM_SMTP_HOST
-            value: {{ .Values.email.smtpHost }}
-          - name: TM_SMTP_PORT
-            value: {{ .Values.email.smtpPort | quote }}
-          - name: TM_SMTP_USER
-            value: {{ .Values.email.smtpUser }}
-          - name: TM_SMTP_PASSWORD
-            value: {{ .Values.email.smtpPassword }}
-          - name: TM_SMTP_USE_TLS
-            value: {{ .Values.email.smtpUseTls | quote }}
-          - name: TM_SMTP_USE_SSL
-            value: {{ .Values.email.smtpUseSsl | quote }}
-          - name: TM_SEND_PROJECT_EMAIL_UPDATES
-            value: {{ .Values.email.sendProjectEmailUpdates | quote }}
-          - name: TM_DEFAULT_LOCALE
-            value: {{ .Values.settings.defaultLocale }}
-          - name: TM_TASK_AUTOUNLOCK_AFTER
-            value: {{ .Values.settings.taskUnlockAfter | quote }}
-          - name: TM_MAPPER_LEVEL_INTERMEDIATE
-            value: {{ .Values.settings.mapperLevelIntermediate | quote }}
-          - name: TM_MAPPER_LEVEL_ADVANCED
-            value: {{ .Values.settings.mapperLevelAdvanced | quote }}
-          - name: TM_IMPORT_MAX_FILESIZE
-            value: {{ .Values.settings.importMaxFilesize | quote }}
-          - name: TM_MAX_AOI_AREA
-            value: {{ .Values.settings.maxAoiArea | quote }}
+            - name: TM_APP_BASE_URL
+              value: {{ .Values.baseUrl }}
+            - name: TM_ORG_NAME
+              value: {{ .Values.org.name }}
+            - name: TM_ORG_CODE
+              value: {{ .Values.org.code }}
+            - name: TM_ORG_LOGO
+              value: {{ .Values.org.logoUrl }}
+            - name: TM_ORG_URL
+              value: {{ .Values.org.url }}
+            - name: TM_ORG_GITHUB
+              value: {{ .Values.org.github }}
+            - name: TM_APP_API_URL
+              value: {{ .Values.apiUrl }}
+            - name: TM_APP_API_VERSION
+              value: v2
+            - name: OSM_SERVER_URL
+              value: {{ .Values.osm.serverUrl }}
+            - name: OSM_SERVER_API_URL
+              value: {{ .Values.osm.serverApiUrl }}
+            - name: OSM_NOMINATIM_SERVER_URL
+              value: {{ .Values.osm.nominatimServerUrl }}
+            - name: OSM_REGISTER_URL
+              value: {{ .Values.osm.registerUrl }}
+            - name: ID_EDITOR_URL
+              value: {{ .Values.osm.idEditorUrl }}
+            - name: POTLATCH2_EDITOR_URL
+              value: {{ .Values.osm.potlatch2EditorUrl }}
+            - name: RAPID_EDITOR_URL
+              value: {{ .Values.osm.rapidEditorUrl }}
+            - name: OHSOME_STATS_BASE_URL
+              value: {{ .Values.ohsome.baseUrl }}
+            - name: OHSOME_STATS_API_URL
+              value: {{ .Values.ohsome.apiUrl }}
+            - name: OHSOME_STATS_TOKEN
+              value: {{ .Values.ohsome.apiToken }}
+            - name: OHSOME_STATS_TOPICS
+              value: {{ .Values.ohsome.topics }}
+            - name: TM_SECRET
+              value: {{ .Values.secret }}
+            - name: TM_CLIENT_ID
+              value: {{ .Values.oAuth2.clientId }}
+            - name: TM_CLIENT_SECRET
+              value: {{ .Values.oAuth2.clientSecret }}
+            - name: TM_REDIRECT_URI
+              value: {{ .Values.oAuth2.redirectUri }}
+            - name: TM_SCOPE
+              value: {{ .Values.oAuth2.scope }}
+            - name: POSTGRES_DB
+              value: tasking-manager
+            - name: POSTGRES_USER
+              value: tm
+            - name: POSTGRES_PASSWORD
+              value: tm
+            - name: POSTGRES_ENDPOINT
+              value: "tasking-manager-db-rw.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_TEST_DB
+              value: taskingmanagertest
+            - name: TM_SMTP_HOST
+              value: {{ .Values.email.smtpHost }}
+            - name: TM_SMTP_PORT
+              value: {{ .Values.email.smtpPort | quote }}
+            - name: TM_SMTP_USER
+              value: {{ .Values.email.smtpUser }}
+            - name: TM_SMTP_PASSWORD
+              value: {{ .Values.email.smtpPassword }}
+            - name: TM_SMTP_USE_TLS
+              value: {{ .Values.email.smtpUseTls | quote }}
+            - name: TM_SMTP_USE_SSL
+              value: {{ .Values.email.smtpUseSsl | quote }}
+            - name: TM_SEND_PROJECT_EMAIL_UPDATES
+              value: {{ .Values.email.sendProjectEmailUpdates | quote }}
+            - name: TM_DEFAULT_LOCALE
+              value: {{ .Values.settings.defaultLocale }}
+            - name: TM_TASK_AUTOUNLOCK_AFTER
+              value: {{ .Values.settings.taskUnlockAfter | quote }}
+            - name: TM_MAPPER_LEVEL_INTERMEDIATE
+              value: {{ .Values.settings.mapperLevelIntermediate | quote }}
+            - name: TM_MAPPER_LEVEL_ADVANCED
+              value: {{ .Values.settings.mapperLevelAdvanced | quote }}
+            - name: TM_IMPORT_MAX_FILESIZE
+              value: {{ .Values.settings.importMaxFilesize | quote }}
+            - name: TM_MAX_AOI_AREA
+              value: {{ .Values.settings.maxAoiArea | quote }}
