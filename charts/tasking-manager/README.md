@@ -35,3 +35,12 @@ email:
   smtpUseSsl: "1"
   sendProjectEmailUpdates: "-1"
 ```
+
+## Make a user admin
+
+```
+psql -h tasking-manager-db-rw.<NAMESPACE>.svc.cluster.local -U tm tasking-manager
+```
+```
+UPDATE users set role = 1, email_address = 'email@jacobhall.net', is_email_verified=true where username = 'jacobwhall';
+```

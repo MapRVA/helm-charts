@@ -56,3 +56,17 @@ backend:
   image: ghcr.io/maprva/backend:937bef5
   replicaCount: 1
   imagePullPolicy: IfNotPresent
+
+backup:
+  enabled: true
+  schedule: "0 0,12 * * *"
+  objectStoreName: backblaze-cnpg-store
+  s3Credentials:
+    destinationPath: s3://cloudnativepg
+    endpointUrl: https://s3.us-east-005.backblazeb2.com
+    accessKeyId:
+      name: cnpg
+      key: ACCESS_KEY_ID
+    secretAccessKey:
+      name: cnpg
+      key: SECRET_ACCESS_KEY

@@ -1,3 +1,36 @@
+{{ if .Values.backup.enabled }}
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: {{ .Values.backup.objectStoreName }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  configuration:
+    destinationPath: {{ .Values.backup.s3Credentials.destinationPath }}
+    endpointURL: {{ .Values.backup.s3Credentials.endpointUrl }}
+    s3Credentials:
+      accessKeyId:
+        name: {{ .Values.backup.s3Credentials.accessKeyId.name }}
+        key: {{ .Values.backup.s3Credentials.accessKeyId.key }}
+      secretAccessKey:
+        name: {{ .Values.backup.s3Credentials.secretAccessKey.name }}
+        key: {{ .Values.backup.s3Credentials.secretAccessKey.key }}
+    wal:
+      compression: gzip
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: tasking-manager-backup
+spec:
+  cluster:
+    name: tasking-manager-db
+  schedule: {{ .Values.backup.schedule }}
+  backupOwnerReference: self
+{{- end }}
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -6,7 +39,7 @@ metadata:
   annotations:
     "helm.sh/hook": pre-install
 spec:
-  instances: 1 # increase for production?
+  instances: 2
   imageName: ghcr.io/cloudnative-pg/postgis:14-3.5
   bootstrap:
     initdb:
@@ -19,6 +52,13 @@ spec:
         - CREATE EXTENSION postgis_topology;
         - CREATE EXTENSION fuzzystrmatch;
         - CREATE EXTENSION postgis_tiger_geocoder;
+  {{- if .Values.backup.enabled }}
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: backblaze-cnpg-store
+  {{- end }}
   storage:
     storageClass: nfs-csi
     size: 5Gi
