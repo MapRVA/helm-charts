@@ -1,22 +1,23 @@
-{{ if .Values.backup.enabled }}
+{{- if eq .Values.database.backend "cnpg" }}
+{{- if .Values.database.backup.enabled }}
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: {{ .Values.backup.objectStoreName }}
+  name: {{ .Values.database.backup.objectStoreName }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install
 spec:
   configuration:
-    destinationPath: {{ .Values.backup.s3Credentials.destinationPath }}
-    endpointURL: {{ .Values.backup.s3Credentials.endpointUrl }}
+    destinationPath: {{ .Values.database.backup.s3Credentials.destinationPath }}
+    endpointURL: {{ .Values.database.backup.s3Credentials.endpointUrl }}
     s3Credentials:
       accessKeyId:
-        name: {{ .Values.backup.s3Credentials.accessKeyId.name }}
-        key: {{ .Values.backup.s3Credentials.accessKeyId.key }}
+        name: {{ .Values.database.backup.s3Credentials.accessKeyId.name }}
+        key: {{ .Values.database.backup.s3Credentials.accessKeyId.key }}
       secretAccessKey:
-        name: {{ .Values.backup.s3Credentials.secretAccessKey.name }}
-        key: {{ .Values.backup.s3Credentials.secretAccessKey.key }}
+        name: {{ .Values.database.backup.s3Credentials.secretAccessKey.name }}
+        key: {{ .Values.database.backup.s3Credentials.secretAccessKey.key }}
     wal:
       compression: gzip
 ---
@@ -27,10 +28,36 @@ metadata:
 spec:
   cluster:
     name: tasking-manager-db
-  schedule: {{ .Values.backup.schedule }}
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  schedule: {{ .Values.database.backup.schedule }}
   backupOwnerReference: self
-{{- end }}
 ---
+{{- end }}
+{{- if .Values.database.recover.enabled }}
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: {{ .Values.database.recover.objectStoreName }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  configuration:
+    destinationPath: {{ .Values.database.recover.s3Credentials.destinationPath }}
+    endpointURL: {{ .Values.database.recover.s3Credentials.endpointUrl }}
+    s3Credentials:
+      accessKeyId:
+        name: {{ .Values.database.recover.s3Credentials.accessKeyId.name }}
+        key: {{ .Values.database.recover.s3Credentials.accessKeyId.key }}
+      secretAccessKey:
+        name: {{ .Values.database.recover.s3Credentials.secretAccessKey.name }}
+        key: {{ .Values.database.recover.s3Credentials.secretAccessKey.key }}
+    wal:
+      compression: gzip
+---
+{{- end }}
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -39,8 +66,22 @@ metadata:
   annotations:
     "helm.sh/hook": pre-install
 spec:
-  instances: 2
+  instances: {{ .Values.database.replicas }}
   imageName: ghcr.io/cloudnative-pg/postgis:14-3.5
+  {{- if .Values.database.recover.enabled }}
+  bootstrap:
+    recovery:
+      source: source
+  externalClusters:
+  - name: source
+    plugin:
+      name: barman-cloud.cloudnative-pg.io
+      parameters:
+        barmanObjectName: {{ .Values.database.recover.objectStoreName }}
+        serverName: tasking-manager-db
+  {{- end }}
+  {{- if .Values.database.backup.enabled }}
+  {{- if not .Values.database.recover.enabled }}
   bootstrap:
     initdb:
       database: tasking-manager
@@ -52,13 +93,90 @@ spec:
         - CREATE EXTENSION postgis_topology;
         - CREATE EXTENSION fuzzystrmatch;
         - CREATE EXTENSION postgis_tiger_geocoder;
-  {{- if .Values.backup.enabled }}
+  {{- end }}
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: backblaze-cnpg-store
+        barmanObjectName: {{ .Values.database.backup.objectStoreName }}
   {{- end }}
   storage:
-    storageClass: nfs-csi
-    size: 5Gi
+    storageClass: {{ .Values.database.storage.storageClass }}
+    size: {{ .Values.database.storage.size }}
+{{- else if eq .Values.database.backend "simple" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasking-manager-db
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: tasking-manager-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasking-manager-db
+  template:
+    metadata:
+      labels:
+        app: tasking-manager-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgis/postgis:14-3.4
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: tasking-manager
+        - name: POSTGRES_USER
+          value: tm
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tasking-manager-db
+              key: password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: tasking-manager-db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tasking-manager-db-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.database.storage.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.database.storage.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasking-manager-db
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: tasking-manager-db
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: tasking-manager-db
+{{- end }}

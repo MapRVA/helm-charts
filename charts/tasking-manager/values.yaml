@@ -48,25 +48,45 @@ settings:
   maxAoiArea: "5000"
 
 frontend:
-  image: ghcr.io/maprva/frontend:1e33863
+  image: ghcr.io/maprva/frontend:54696ed
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
 backend:
-  image: ghcr.io/maprva/backend:1e33863
+  image: ghcr.io/maprva/backend:54696ed
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
-backup:
-  enabled: true
-  schedule: "0 0,12 * * *"
-  objectStoreName: backblaze-cnpg-store
-  s3Credentials:
-    destinationPath: s3://cloudnativepg
-    endpointUrl: https://s3.us-east-005.backblazeb2.com
-    accessKeyId:
-      name: cnpg
-      key: ACCESS_KEY_ID
-    secretAccessKey:
-      name: cnpg
-      key: SECRET_ACCESS_KEY
+database:
+  backend: cnpg # this can be "cnpg", "simple", or "none"
+  replicas: 2 # only works with cnpg backend
+  storage:
+    storageClass: nfs-csi
+    size: 5Gi
+  # backups currently only work with cnpg backend
+  backup:
+    enabled: true
+    schedule: "0 0,12 * * *"
+    objectStoreName: my-backup-store
+    s3Credentials:
+      destinationPath: s3://backup-bucket-name
+      endpointUrl: https://s3.zone.example.com
+      accessKeyId:
+        name: cnpg-backup
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: cnpg-backup
+        key: SECRET_ACCESS_KEY
+  # recovery also cnpg-only
+  recover:
+    enabled: false
+    objectStoreName: my-recover-store
+    s3Credentials:
+      destinationPath: s3://recover-bucket-name
+      endpointUrl: https://s3.zone.example.com
+      accessKeyId:
+        name: cnpg-recover
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: cnpg-recover
+        key: SECRET_ACCESS_KEY
