@@ -34,6 +34,9 @@ email:
   smtpUseTls: "0"
   smtpUseSsl: "1"
   sendProjectEmailUpdates: "-1"
+
+database:
+  backend: simple
 ```
 
 ## Make a user admin
@@ -43,4 +46,10 @@ psql -h tasking-manager-db-rw.<NAMESPACE>.svc.cluster.local -U tm tasking-manage
 ```
 ```
 UPDATE users set role = 1, email_address = 'email@jacobhall.net', is_email_verified=true where username = 'jacobwhall';
+```
+
+## Disable default banner
+
+```
+UPDATE banner SET visible=false;
 ```
