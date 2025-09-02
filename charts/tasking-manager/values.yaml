@@ -68,6 +68,7 @@ database:
   backup:
     enabled: true
     schedule: "0 0 0,12 * * *"
+    retentionPolicy: "30d"
     objectStoreName: my-backup-store
     s3Credentials:
       destinationPath: s3://backup-bucket-name
