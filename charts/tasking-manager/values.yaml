@@ -67,7 +67,7 @@ database:
   # backups currently only work with cnpg backend
   backup:
     enabled: true
-    schedule: "0 0,12 * * *"
+    schedule: "0 0 0,12 * * *"
     objectStoreName: my-backup-store
     s3Credentials:
       destinationPath: s3://backup-bucket-name
