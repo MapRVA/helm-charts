@@ -94,6 +94,8 @@ spec:
               value: {{ .Values.email.smtpUseSsl | quote }}
             - name: TM_SEND_PROJECT_EMAIL_UPDATES
               value: {{ .Values.email.sendProjectEmailUpdates | quote }}
+            - name: TM_DEFAULT_CHANGESET_COMMENT
+              value: {{ .Values.settings.defaultChangesetComment }}
             - name: TM_DEFAULT_LOCALE
               value: {{ .Values.settings.defaultLocale }}
             - name: TM_TASK_AUTOUNLOCK_AFTER

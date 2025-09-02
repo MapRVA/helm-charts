@@ -56,6 +56,8 @@ spec:
               value: {{ .Values.oAuth2.clientId }}
             - name: REACT_APP_REDIRECT_URI
               value: {{ .Values.oAuth2.redirectUri }}
+            - name: REACT_APP_DEFAULT_CHANGESET_COMMENT
+              value: {{ .Values.settings.defaultChangesetComment }}
             - name: REACT_APP_DEFAULT_LOCALE
               value: {{ .Values.settings.defaultLocale }}
             - name: REACT_APP_MAPPER_LEVEL_INTERMEDIATE

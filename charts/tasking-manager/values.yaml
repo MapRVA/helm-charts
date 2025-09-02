@@ -40,6 +40,7 @@ email:
   sendProjectEmailUpdates: "-1"
 
 settings:
+  defaultChangesetComment: "tasks-hotosm" # BEWARE, a number sign (#) is prepended to this string
   defaultLocale: en
   taskUnlockAfter: 2h
   mapperLevelIntermediate: "250"
@@ -48,12 +49,12 @@ settings:
   maxAoiArea: "5000"
 
 frontend:
-  image: ghcr.io/maprva/frontend:54696ed
+  image: ghcr.io/maprva/frontend:0f20339
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
 backend:
-  image: ghcr.io/maprva/backend:54696ed
+  image: ghcr.io/maprva/backend:0f20339
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
