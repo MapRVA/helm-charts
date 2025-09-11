@@ -4,7 +4,7 @@ metadata:
   name: georef-frontend
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.frontendReplicaCount }}
+  replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
       app: georeference-tool
