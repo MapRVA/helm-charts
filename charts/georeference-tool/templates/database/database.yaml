@@ -20,7 +20,7 @@ spec:
         key: {{ .Values.database.backup.s3Credentials.secretAccessKey.key }}
     wal:
       compression: gzip
-    retentionPolicy: {{ .Values.database.backup.retentionPolicy }}
+  retentionPolicy: {{ .Values.database.backup.retentionPolicy }}
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
