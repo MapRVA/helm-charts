@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: georef-frontend
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.frontendReplicaCount }}
+  selector:
+    matchLabels:
+      app: georeference-tool
+  template:
+    metadata:
+      labels:
+        app: georeference-tool
+    spec:
+      containers:
+        - name: django
+          image: {{ .Values.frontend.image }}
+          imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          env:
+            - name: DJANGO_SECRET_KEY
+              value: {{ .Values.django.secretKey }}
+            - name: DJANGO_ALLOWED_HOSTS
+              value: {{ .Values.django.allowedHosts }}
+            - name: DJANGO_DEBUG
+              value: "{{ .Values.django.debug }}"
+            - name: PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: georef-db-app
+                  key: host
+            - name: PG_DBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: georef-db-app
+                  key: dbname
+            - name: PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: georef-db-app
+                  key: port
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: georef-db-app
+                  key: username
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: georef-db-app
+                  key: password
+            - name: OSM_ADMIN_USERNAMES
+              value: {{.Values.django.adminUsernames }}
+            - name: OSM_URL
+              value: {{ .Values.osm.serverUrl }}
+            - name: OSM_CLIENT_ID
+              value: {{ .Values.osm.clientId }}
+            - name: OSM_CLIENT_SECRET
+              value: {{ .Values.osm.clientSecret }}
+            - name: OSM_SECRET_KEY
+              value: {{ .Values.osm.secretKey }}
+            - name: OSM_LOGIN_REDIRECT_URI
+              value: {{ .Values.osm.redirectUri }}
+            - name: IMPORT_R2_PUBLIC_URL_BASE
+              value: {{ .Values.import.r2.publicUrlBase }}
+            - name: IMPORT_R2_BUCKET_NAME
+              value: {{ .Values.import.r2.bucketName }}
+            - name: IMPORT_R2_ACCESS_KEY_ID
+              value: {{ .Values.import.r2.accessKeyId }}
+            - name: IMPORT_R2_SECRET_ACCESS_KEY
+              value: {{ .Values.import.r2.secretAccessKey }}
+            - name: IMPORT_R2_ENDPOINT_URL
+              value: {{ .Values.import.r2.endpointUrl }}

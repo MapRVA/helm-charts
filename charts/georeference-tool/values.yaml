@@ -1,0 +1,61 @@
+frontend:
+  image: ghcr.io/maprva/georeference-tool:efa2ddc
+  pullPolicy: IfNotPresent
+  replicaCount: 3
+
+osm:
+  serverUrl: https://www.openstreetmap.org
+  clientId: <CLIENT ID>
+  clientSecret: <CLIENT SECRET>
+  secretKey: <SECRET KEY>
+  redirectUri: <REDIRECT URI>
+
+django:
+  secretKey: <DJANGO SECRET KEY>
+  debug: "false"
+  allowedHosts: <ALLOWED HOSTS>
+  adminUsernames: <USERNAMES> # comma-separated list with no spaces
+
+database:
+  backend: cnpg # this can be "cnpg", "simple", or "none"
+  name: georeference-tool
+  replicas: 2 # only works with cnpg backend
+  storage:
+    storageClass: nfs-csi
+    size: 5Gi
+  # backups currently only work with cnpg backend
+  backup:
+    enabled: true
+    schedule: "0 0 0,12 * * *"
+    retentionPolicy: "30d"
+    objectStoreName: my-backup-store
+    s3Credentials:
+      destinationPath: s3://backup-bucket-name
+      endpointUrl: https://s3.zone.example.com
+      accessKeyId:
+        name: cnpg-backup
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: cnpg-backup
+        key: SECRET_ACCESS_KEY
+  # recovery also cnpg-only
+  recover:
+    enabled: false
+    objectStoreName: my-recover-store
+    s3Credentials:
+      destinationPath: s3://recover-bucket-name
+      endpointUrl: https://s3.zone.example.com
+      accessKeyId:
+        name: cnpg-recover
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: cnpg-recover
+        key: SECRET_ACCESS_KEY
+
+import:
+  r2:
+    publicUrlBase: ""
+    bucketName: ""
+    accessKeyId: ""
+    secretAccessKey: ""
+    endpointUrl: ""
