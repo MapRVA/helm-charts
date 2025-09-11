@@ -82,14 +82,6 @@ spec:
         serverName: georef-db
   {{- end }}
   {{- if .Values.database.backup.enabled }}
-  {{- if not .Values.database.recover.enabled }}
-  bootstrap:
-    initdb:
-      database: georef
-      owner: django_user
-      secret:
-        name: georef-db
-  {{- end }}
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
