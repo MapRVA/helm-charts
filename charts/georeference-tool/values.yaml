@@ -19,7 +19,7 @@ django:
 database:
   backend: cnpg # this can be "cnpg", "simple", or "none"
   name: georeference-tool
-  replicas: 2 # only works with cnpg backend
+  replicas: 3 # only works with cnpg backend
   storage:
     storageClass: nfs-csi
     size: 5Gi
