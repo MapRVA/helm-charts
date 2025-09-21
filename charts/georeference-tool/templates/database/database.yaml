@@ -69,8 +69,11 @@ metadata:
 spec:
   instances: {{ .Values.database.replicas }}
   imageName: ghcr.io/cloudnative-pg/postgresql:17.6-standard-trixie
-  {{- if .Values.database.recover.enabled }}
   bootstrap:
+    initdb:
+      postInitTemplateSQL:
+        - CREATE EXTENSION vector;
+  {{- if .Values.database.recover.enabled }}
     recovery:
       source: source
   externalClusters:
@@ -80,11 +83,6 @@ spec:
       parameters:
         barmanObjectName: {{ .Values.database.recover.objectStoreName }}
         serverName: georef-db
-  {{ else }}
-  bootstrap:
-    initdb:
-      postInitTemplateSQL:
-        - CREATE EXTENSION vector;
   {{- end }}
   {{- if .Values.database.backup.enabled }}
   plugins:
