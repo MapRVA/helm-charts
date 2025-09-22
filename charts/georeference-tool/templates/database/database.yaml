@@ -85,6 +85,7 @@ spec:
     initdb:
       postInitTemplateSQL:
         - CREATE EXTENSION vector;
+        - CREATE EXTENSION pg_trgm;
   {{- end }}
   {{- if .Values.database.backup.enabled }}
   plugins:
