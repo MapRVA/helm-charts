@@ -3,6 +3,16 @@ entries:
   georeference-tool:
   - apiVersion: v2
     appVersion: latest
+    created: "2025-09-27T07:05:24.146252402Z"
+    description: A Helm chart for Georeference Tool
+    digest: 20425f768c94e1804e654eea1625724bbf09bf1cae2bc6f549605ebb3df7f28d
+    name: georeference-tool
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/georeference-tool-1.11.0/georeference-tool-1.11.0.tgz
+    version: 1.11.0
+  - apiVersion: v2
+    appVersion: latest
     created: "2025-09-26T16:00:31.593035448Z"
     description: A Helm chart for Georeference Tool
     digest: 21424bf42436ace3fb976e246ba4c9b381efe4ef88c90326fd41fa2469d19f15
@@ -562,4 +572,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/tasking-manager-0.1.0/tasking-manager-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-26T16:00:31.593469776Z"
+generated: "2025-09-27T07:05:24.146611452Z"
