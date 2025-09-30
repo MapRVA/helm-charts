@@ -68,7 +68,7 @@ metadata:
     "helm.sh/hook": pre-install
 spec:
   instances: {{ .Values.database.replicas }}
-  imageName: ghcr.io/cloudnative-pg/postgresql:17.6-standard-trixie
+  imageName: ghcr.io/maprva/cnpg-postgis-pgvector:17
   {{- if .Values.database.recover.enabled }}
   bootstrap:
     recovery:
@@ -86,6 +86,7 @@ spec:
       postInitTemplateSQL:
         - CREATE EXTENSION vector;
         - CREATE EXTENSION pg_trgm;
+        - CREATE EXTENSION postgis;
   {{- end }}
   {{- if .Values.database.backup.enabled }}
   plugins:
