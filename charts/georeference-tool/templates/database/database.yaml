@@ -117,7 +117,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgis/postgis:17
+        image: ghcr.io/maprva/cnpg-postgis-pgvector:17
         ports:
         - containerPort: 5432
         env:

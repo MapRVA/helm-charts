@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/georeference-tool:867e32b
+  image: ghcr.io/maprva/georeference-tool:015ad52
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -21,8 +21,8 @@ database:
   name: georeference-tool
   replicas: 3 # only works with cnpg backend
   storage:
-    storageClass: nfs-csi
-    size: 5Gi
+    storageClass: local-path
+    size: 50Gi
   # backups currently only work with cnpg backend
   backup:
     enabled: true
