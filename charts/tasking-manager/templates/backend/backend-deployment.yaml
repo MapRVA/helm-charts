@@ -100,10 +100,6 @@ spec:
               value: {{ .Values.settings.defaultLocale }}
             - name: TM_TASK_AUTOUNLOCK_AFTER
               value: {{ .Values.settings.taskUnlockAfter | quote }}
-            - name: TM_MAPPER_LEVEL_INTERMEDIATE
-              value: {{ .Values.settings.mapperLevelIntermediate | quote }}
-            - name: TM_MAPPER_LEVEL_ADVANCED
-              value: {{ .Values.settings.mapperLevelAdvanced | quote }}
             - name: TM_IMPORT_MAX_FILESIZE
               value: {{ .Values.settings.importMaxFilesize | quote }}
             - name: TM_MAX_AOI_AREA
