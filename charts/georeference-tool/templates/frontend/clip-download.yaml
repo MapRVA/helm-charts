@@ -21,7 +21,7 @@ spec:
               value: {{ .Values.django.secretKey }}
           volumeMounts:
             - name: clip-cache
-              mountPath: /cache
+              mountPath: /app/models
       volumes:
         - name: clip-cache
           persistentVolumeClaim:

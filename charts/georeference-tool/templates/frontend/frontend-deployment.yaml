@@ -73,7 +73,7 @@ spec:
               value: {{ .Values.import.r2.endpointUrl }}
           volumeMounts:
             - name: clip-cache
-              mountPath: /cache
+              mountPath: /app/models
               readOnly: true
       volumes:
         - name: clip-cache
