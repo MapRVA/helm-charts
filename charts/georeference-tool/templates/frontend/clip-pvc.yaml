@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: georef-clip-cache
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.clip.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.clip.size }}
