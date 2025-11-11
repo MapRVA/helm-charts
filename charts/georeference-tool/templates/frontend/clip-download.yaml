@@ -16,6 +16,9 @@ spec:
           imagePullPolicy: Always
           command:
             ["uv", "run", "manage.py", "download_clip_model"]
+          env:
+            - name: DJANGO_SECRET_KEY
+              value: {{ .Values.django.secretKey }}
           volumeMounts:
             - name: clip-cache
               mountPath: /cache
