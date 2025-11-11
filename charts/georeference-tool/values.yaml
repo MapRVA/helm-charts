@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/georeference-tool:c9f3a83
+  image: ghcr.io/maprva/georeference-tool:bc80ee0
   pullPolicy: IfNotPresent
   replicaCount: 3
 
