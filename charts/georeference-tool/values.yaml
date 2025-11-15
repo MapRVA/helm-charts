@@ -11,6 +11,7 @@ osm:
   redirectUri: <REDIRECT URI>
 
 django:
+  timeZone: "UTC"
   secretKey: <DJANGO SECRET KEY>
   debug: "false"
   allowedHosts: <ALLOWED HOSTS>

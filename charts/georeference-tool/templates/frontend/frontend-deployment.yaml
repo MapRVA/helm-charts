@@ -18,6 +18,8 @@ spec:
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
           env:
+            - name: DJANGO_TIME_ZONE
+              value: {{ .Values.django.timeZone }}
             - name: DJANGO_SECRET_KEY
               value: {{ .Values.django.secretKey }}
             - name: DJANGO_ALLOWED_HOSTS
