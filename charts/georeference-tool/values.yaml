@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/georeference-tool:5ddb716
+  image: ghcr.io/maprva/georeference-tool:014df02
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -56,6 +56,9 @@ database:
       secretAccessKey:
         name: cnpg-recover
         key: SECRET_ACCESS_KEY
+
+protomaps:
+  key: MY_PROTOMAPS_KEY
 
 import:
   r2:

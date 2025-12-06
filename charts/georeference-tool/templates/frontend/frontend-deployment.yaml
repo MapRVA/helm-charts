@@ -51,6 +51,8 @@ spec:
                 secretKeyRef:
                   name: georef-db-app
                   key: password
+            - name: PROTOMAPS_API_KEY
+              value: {{.Values.protomaps.key }}
             - name: OSM_ADMIN_USERNAMES
               value: {{.Values.django.adminUsernames }}
             - name: OSM_URL
