@@ -1,7 +1,11 @@
 frontend:
-  image: ghcr.io/maprva/georeference-tool:fbb5828
+  image: ghcr.io/maprva/georeference-tool:fb11e73
   pullPolicy: IfNotPresent
   replicaCount: 3
+
+tasks:
+  background:
+    replicaCount: 3
 
 osm:
   serverUrl: https://www.openstreetmap.org

@@ -1,22 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: georef-frontend
+  name: background-worker
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.frontend.replicaCount }}
+  replicas: {{ .Values.tasks.background.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
-      app: georeference-tool
+      app: yesterdays-background-worker
   template:
     metadata:
       labels:
-        app: georeference-tool
+        app: yesterdays-background-worker
     spec:
+      terminationGracePeriodSeconds: 300
       containers:
-        - name: django
+        - name: celery-worker
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          command: ["uv"]
+          args:
+            - "run"
+            - "celery"
+            - "-A"
+            - "yesterdays"
+            - "worker"
+            - "--loglevel=info"
+            - "-Q"
+            - "background"
+            - "--max-tasks-per-child=100"
           env:
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}
@@ -52,9 +69,9 @@ spec:
                   name: georef-db-app
                   key: password
             - name: PROTOMAPS_API_KEY
-              value: {{.Values.protomaps.key }}
+              value: {{ .Values.protomaps.key }}
             - name: OSM_ADMIN_USERNAMES
-              value: {{.Values.django.adminUsernames }}
+              value: {{ .Values.django.adminUsernames }}
             - name: OSM_URL
               value: {{ .Values.osm.serverUrl }}
             - name: OSM_CLIENT_ID

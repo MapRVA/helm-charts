@@ -1,0 +1,6 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: yesterdays-rabbitmq
+spec:
+  replicas: 3
