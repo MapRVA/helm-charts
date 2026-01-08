@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:bdb1f63
+  image: ghcr.io/maprva/yesterdays:15461dd
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -79,8 +79,8 @@ metadataRefresh:
   # Default 15s = 4 per minute
   wikidataInterval: 15
   osmInterval: 15
-  # Days after which metadata is considered stale and needs refresh
-  staleDays: 30
+  # Hours after which metadata is considered stale and needs refresh
+  staleHours: 24
   # Max consecutive failures before giving up on a record
   maxFailures: 5
   # Postpass API settings for OSM geometry fetching

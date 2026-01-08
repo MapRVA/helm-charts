@@ -83,8 +83,8 @@ spec:
               value: {{ .Values.metadataRefresh.wikidataInterval | quote }}
             - name: METADATA_REFRESH_OSM_INTERVAL
               value: {{ .Values.metadataRefresh.osmInterval | quote }}
-            - name: METADATA_REFRESH_STALE_DAYS
-              value: {{ .Values.metadataRefresh.staleDays | quote }}
+            - name: METADATA_REFRESH_STALE_HOURS
+              value: {{ .Values.metadataRefresh.staleHours | quote }}
             - name: METADATA_REFRESH_MAX_FAILURES
               value: {{ .Values.metadataRefresh.maxFailures | quote }}
             - name: METADATA_REFRESH_POSTPASS_URL
