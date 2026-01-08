@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:e5c0057
+  image: ghcr.io/maprva/yesterdays:bdb1f63
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -75,9 +75,10 @@ import:
     endpointUrl: ""
 
 metadataRefresh:
-  # Rate limits use Celery format: "4/m" = 4 per minute, "1/s" = 1 per second
-  wikidataRateLimit: "4/m"
-  osmRateLimit: "4/m"
+  # Refresh intervals in seconds (how often Celery Beat triggers each task)
+  # Default 15s = 4 per minute
+  wikidataInterval: 15
+  osmInterval: 15
   # Days after which metadata is considered stale and needs refresh
   staleDays: 30
   # Max consecutive failures before giving up on a record
