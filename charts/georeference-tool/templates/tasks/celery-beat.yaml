@@ -1,26 +1,24 @@
+{{- if .Values.tasks.beat.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: background-worker
+  name: celery-beat
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.tasks.background.replicaCount }}
+  replicas: 1
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+    type: Recreate
   selector:
     matchLabels:
-      app: yesterdays-background-worker
+      app: yesterdays-celery-beat
   template:
     metadata:
       labels:
-        app: yesterdays-background-worker
+        app: yesterdays-celery-beat
     spec:
-      terminationGracePeriodSeconds: 300
+      terminationGracePeriodSeconds: 30
       containers:
-        - name: celery-worker
+        - name: celery-beat
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
           command: ["uv"]
@@ -29,11 +27,8 @@ spec:
             - "celery"
             - "-A"
             - "yesterdays"
-            - "worker"
+            - "beat"
             - "--loglevel=info"
-            - "-Q"
-            - "background"
-            - "--max-tasks-per-child=100"
           env:
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}
@@ -68,30 +63,6 @@ spec:
                 secretKeyRef:
                   name: georef-db-app
                   key: password
-            - name: PROTOMAPS_API_KEY
-              value: {{ .Values.protomaps.key }}
-            - name: OSM_ADMIN_USERNAMES
-              value: {{ .Values.django.adminUsernames }}
-            - name: OSM_URL
-              value: {{ .Values.osm.serverUrl }}
-            - name: OSM_CLIENT_ID
-              value: {{ .Values.osm.clientId }}
-            - name: OSM_CLIENT_SECRET
-              value: {{ .Values.osm.clientSecret }}
-            - name: OSM_SECRET_KEY
-              value: {{ .Values.osm.secretKey }}
-            - name: OSM_LOGIN_REDIRECT_URI
-              value: {{ .Values.osm.redirectUri }}
-            - name: IMPORT_R2_PUBLIC_URL_BASE
-              value: {{ .Values.import.r2.publicUrlBase }}
-            - name: IMPORT_R2_BUCKET_NAME
-              value: {{ .Values.import.r2.bucketName }}
-            - name: IMPORT_R2_ACCESS_KEY_ID
-              value: {{ .Values.import.r2.accessKeyId }}
-            - name: IMPORT_R2_SECRET_ACCESS_KEY
-              value: {{ .Values.import.r2.secretAccessKey }}
-            - name: IMPORT_R2_ENDPOINT_URL
-              value: {{ .Values.import.r2.endpointUrl }}
             - name: RABBITMQ_HOST
               value: "yesterdays-rabbitmq.{{ .Release.Namespace }}.svc.cluster.local"
             - name: RABBITMQ_PORT
@@ -122,11 +93,4 @@ spec:
               value: {{ .Values.metadataRefresh.postpassTimeout | quote }}
             - name: METADATA_REFRESH_POSTPASS_BBOX
               value: {{ .Values.metadataRefresh.postpassBbox | quote }}
-          volumeMounts:
-            - name: clip-cache
-              mountPath: /app/models
-              readOnly: true
-      volumes:
-        - name: clip-cache
-          persistentVolumeClaim:
-            claimName: georef-clip-cache
+{{- end }}

@@ -1,11 +1,13 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:1c8f91d
+  image: ghcr.io/maprva/yesterdays:e5c0057
   pullPolicy: IfNotPresent
   replicaCount: 3
 
 tasks:
   background:
     replicaCount: 3
+  beat:
+    enabled: true
 
 osm:
   serverUrl: https://www.openstreetmap.org
@@ -71,3 +73,17 @@ import:
     accessKeyId: ""
     secretAccessKey: ""
     endpointUrl: ""
+
+metadataRefresh:
+  # Rate limits use Celery format: "4/m" = 4 per minute, "1/s" = 1 per second
+  wikidataRateLimit: "4/m"
+  osmRateLimit: "4/m"
+  # Days after which metadata is considered stale and needs refresh
+  staleDays: 30
+  # Max consecutive failures before giving up on a record
+  maxFailures: 5
+  # Postpass API settings for OSM geometry fetching
+  postpassUrl: "https://postpass.geofabrik.de/api/0.2/interpreter"
+  postpassTimeout: 60
+  # Bounding box for OSM queries (Virginia and surrounding area)
+  postpassBbox: "ST_SetSRID(ST_MakeBox2D(ST_MakePoint(-84.72, 35.90), ST_MakePoint(-74.97, 39.71)), 4326)"
