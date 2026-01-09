@@ -76,9 +76,9 @@ import:
 
 metadataRefresh:
   # Refresh intervals in seconds (how often Celery Beat triggers each task)
-  # Default 15s = 4 per minute
-  wikidataInterval: 15
-  osmInterval: 15
+  # Default 60s = 1 per minute
+  wikidataInterval: 60
+  osmInterval: 60
   # Hours after which metadata is considered stale and needs refresh
   staleHours: 24
   # Max consecutive failures before giving up on a record
