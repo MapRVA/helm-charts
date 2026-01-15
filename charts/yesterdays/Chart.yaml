@@ -1,6 +1,6 @@
 apiVersion: v2
-name: georeference-tool
-description: A Helm chart for Georeference Tool
+name: yesterdays
+description: A Helm chart for Yesterdays
 
 # A chart can be either an 'application' or a 'library' chart.
 #
