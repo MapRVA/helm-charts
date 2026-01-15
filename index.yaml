@@ -1652,4 +1652,15 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/tasking-manager-0.1.0/tasking-manager-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-15T03:58:17.047416957Z"
+  yesterdays:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-01-15T04:00:55.186413631Z"
+    description: A Helm chart for Yesterdays
+    digest: ae956762daf13aed37a8d795e8688b55e833060c7ee2ac1aafd472929cf3453f
+    name: yesterdays
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
+    version: 2.5.8
+generated: "2026-01-15T04:00:55.186801064Z"
