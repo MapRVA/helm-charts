@@ -94,6 +94,9 @@ metrics:
   enabled: false
   path: "/metrics"
 
+  grafanaDashboard:
+    title: "Yesterdays"
+
   serviceMonitor:
     enabled: true
     namespace: ""  # Empty = same namespace as app

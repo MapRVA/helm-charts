@@ -8,5 +8,5 @@ metadata:
     grafana_dashboard: "1"
 data:
   django-dashboard.json: |-
-{{ .Files.Get "dashboards/django.json" | replace "$namespace" .Release.Namespace | replace "${DS_PROMETHEUS}" "prometheus" | indent 4 }}
+{{ .Files.Get "dashboards/django.json" | replace "$namespace" .Release.Namespace | replace "${DS_PROMETHEUS}" "prometheus" | replace "PLACEHOLDER_TITLE" .Values.metrics.grafanaDashboard.title | indent 4 }}
 {{- end }}
