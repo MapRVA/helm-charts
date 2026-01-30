@@ -2149,7 +2149,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": PLACEHOLDER_TITLE,
+  "title": "PLACEHOLDER_TITLE",
   "uid": "yesterdays-$namespace",
   "version": 52,
   "weekStart": "",
