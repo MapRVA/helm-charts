@@ -2149,8 +2149,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Yesterdays (Draft)",
-  "uid": "addwhcm",
+  "title": "Yesterdays",
+  "uid": "yesterdays-django",
   "version": 52,
   "weekStart": "",
   "id": null
