@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:e11350b
+  image: ghcr.io/maprva/yesterdays:449cb2d
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -88,3 +88,20 @@ metadataRefresh:
   postpassTimeout: 60
   # Bounding box for OSM queries (Virginia and surrounding area)
   postpassBbox: "ST_SetSRID(ST_MakeBox2D(ST_MakePoint(-84.72, 35.90), ST_MakePoint(-74.97, 39.71)), 4326)"
+
+# Prometheus metrics configuration
+metrics:
+  enabled: false
+  path: "/metrics"
+
+  serviceMonitor:
+    enabled: true
+    namespace: ""  # Empty = same namespace as app
+    interval: "30s"
+    scrapeTimeout: "10s"
+    labels: {}
+
+  prometheusRule:
+    enabled: false  # Enable when you want alerting
+    namespace: ""
+    labels: {}
