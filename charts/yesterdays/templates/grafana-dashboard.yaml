@@ -1,0 +1,12 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-django-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+data:
+  django-dashboard.json: |-
+{{ .Files.Get "dashboards/django.json" | replace "\"$namespace\"" (printf "\"%s\"" .Release.Namespace) | replace "${DS_PROMETHEUS}" "prometheus" | indent 4 }}
+{{- end }}
