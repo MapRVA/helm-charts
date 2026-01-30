@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-django-dashboard
+  name: {{ .Release.Name }}-yesterdays-dashboard
   namespace: {{ .Release.Namespace }}
   labels:
     grafana_dashboard: "1"
