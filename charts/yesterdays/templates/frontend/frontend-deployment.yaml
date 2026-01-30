@@ -99,6 +99,11 @@ spec:
             - name: clip-cache
               mountPath: /app/models
               readOnly: true
+          ports:
+            - name: http
+              containerPort: 8000
+            - name: metrics
+              containerPort: 9090
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
