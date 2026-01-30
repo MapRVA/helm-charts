@@ -2150,7 +2150,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": PLACEHOLDER_TITLE,
-  "uid": "yesterdays-django",
+  "uid": "yesterdays-$namespace",
   "version": 52,
   "weekStart": "",
   "id": null
