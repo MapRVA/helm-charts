@@ -91,10 +91,19 @@ spec:
                   key: password
             - name: CELERY_BROKER_URL
               value: "amqp://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)//"
+            - name: CLIP_WARMUP_ENABLED
+              value: "true"
             {{- if .Values.metrics.enabled }}
             - name: PROMETHEUS_ENABLED
               value: "true"
             {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
           volumeMounts:
             - name: clip-cache
               mountPath: /app/models
