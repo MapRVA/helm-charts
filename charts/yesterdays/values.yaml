@@ -9,6 +9,15 @@ tasks:
   beat:
     enabled: true
 
+rabbitmq:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 osm:
   serverUrl: https://www.openstreetmap.org
   clientId: <CLIENT ID>
