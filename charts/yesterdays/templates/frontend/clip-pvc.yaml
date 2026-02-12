@@ -1,9 +1,9 @@
-{{- $pvcExists := (lookup "v1" "PersistentVolumeClaim" .Release.Namespace "georef-clip-cache") }}
+{{- $pvcExists := (lookup "v1" "PersistentVolumeClaim" .Release.Namespace "yesterdays-clip-cache") }}
 {{- if not $pvcExists }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: georef-clip-cache
+  name: yesterdays-clip-cache
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade

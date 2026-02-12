@@ -1,13 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: georef-clip-download
+  name: yesterdays-clip-download
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   ttlSecondsAfterFinished: 3600 # one hour
   template:
+    metadata:
+      labels:
+        app: yesterdays-clip-download
     spec:
       restartPolicy: Never
       containers:
@@ -25,4 +28,4 @@ spec:
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
-            claimName: georef-clip-cache
+            claimName: yesterdays-clip-cache

@@ -144,12 +144,12 @@ spec:
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
-          claimName: tasking-manager-db-pvc
+          claimName: yesterdays-db-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tasking-manager-db-pvc
+  name: yesterdays-db-pvc
   namespace: {{ .Release.Namespace }}
 spec:
   accessModes:

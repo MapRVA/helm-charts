@@ -1,13 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: georef-db-migration
+  name: yesterdays-db-migration
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   ttlSecondsAfterFinished: 21600 # six hours
   template:
+    metadata:
+      labels:
+        app: yesterdays-db-migration
     spec:
       restartPolicy: Never
       containers:

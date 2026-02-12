@@ -1,7 +1,94 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:5928df6
+  image: ghcr.io/maprva/yesterdays:a3c730f
   pullPolicy: IfNotPresent
   replicaCount: 3
+
+# Exposure configuration (how the app is exposed externally)
+# type: "none" | "ingress" | "gateway" | "custom"
+#   - none: No ingress resources created, no external traffic allowed
+#   - ingress: Traditional Kubernetes Ingress resource
+#   - gateway: Gateway API HTTPRoute resource
+#   - custom: No resources created, but allows traffic from custom sources (bring your own ingress/gateway)
+exposure:
+  type: none
+
+  # Traditional Kubernetes Ingress configuration (used when type: ingress)
+  ingress:
+    className: ""  # e.g., "nginx", "traefik"
+    annotations: {}
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - host: yesterdays.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    #  - secretName: yesterdays-tls
+    #    hosts:
+    #      - yesterdays.example.com
+    # Network policy: which pods can send traffic to the frontend
+    networkPolicy:
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+
+  # Gateway API configuration (used when type: gateway)
+  gateway:
+    # Reference to an existing Gateway resource
+    parentRefs:
+      - name: eg
+        namespace: envoy-gateway-system
+    hostnames:
+      - yesterdays.example.com
+    # Network policy: which pods can send traffic to the frontend
+    networkPolicy:
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: envoy-gateway-system
+      podSelector:
+        matchLabels:
+          gateway.envoyproxy.io/owning-gateway-name: eg
+
+  # Custom configuration (used when type: custom)
+  # Use this when you manage your own Ingress/Gateway resources outside this chart
+  custom:
+    # Network policy peers that should be allowed to reach the frontend
+    networkPolicy: []
+    # - namespaceSelector:
+    #     matchLabels:
+    #       custom-label: value
+    #   podSelector:
+    #     matchLabels:
+    #       app: custom-proxy
+
+# Network Policies for securing pod-to-pod and external communication
+networkPolicies:
+  enabled: true
+
+  # External API egress configuration
+  externalEgress:
+    # If true, allows all external egress (0.0.0.0/0)
+    # If false, only allows egress to specified CIDRs
+    allowAll: true
+    # Specific CIDRs to allow when allowAll is false
+    # cidrs:
+    #   - cidr: 0.0.0.0/0
+    #     ports:
+    #       - port: 443
+    #         protocol: TCP
+
+  # DNS egress (required for all pods to resolve service names)
+  dns:
+    # Namespace where CoreDNS/kube-dns runs
+    namespace: kube-system
+    # Labels to select DNS pods
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
 
 tasks:
   background:

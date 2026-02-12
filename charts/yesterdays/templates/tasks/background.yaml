@@ -129,4 +129,4 @@ spec:
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
-            claimName: georef-clip-cache
+            claimName: yesterdays-clip-cache

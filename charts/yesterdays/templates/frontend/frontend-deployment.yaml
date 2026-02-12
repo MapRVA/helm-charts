@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: georef-frontend
+  name: yesterdays-frontend
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
-      app: georeference-tool
+      app: yesterdays-frontend
   template:
     metadata:
       labels:
-        app: georeference-tool
+        app: yesterdays-frontend
     spec:
       containers:
         - name: django
@@ -97,6 +97,13 @@ spec:
             - name: PROMETHEUS_ENABLED
               value: "true"
             {{- end }}
+          resources:
+            requests:
+              memory: "3500Mi"
+              cpu: "500m"
+            limits:
+              memory: "5000Mi"
+              cpu: "2000m"
           readinessProbe:
             httpGet:
               path: /health/ready/
@@ -119,4 +126,4 @@ spec:
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
-            claimName: georef-clip-cache
+            claimName: yesterdays-clip-cache
