@@ -2101,6 +2101,17 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/georeference-tool-1.0.0/georeference-tool-1.0.0.tgz
     version: 1.0.0
+  overpass:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-02-14T21:39:23.667017278Z"
+    description: A Helm chart for Kubernetes
+    digest: a270e642d7a7c063c575b13056aadf3b84e5559e42db05983ffc3944d48fdf06
+    name: overpass
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/overpass-0.1.0/overpass-0.1.0.tgz
+    version: 0.1.0
   tasking-manager:
   - apiVersion: v2
     appVersion: 5.3.3
@@ -2303,4 +2314,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
     version: 2.5.8
-generated: "2026-02-13T18:21:08.453322422Z"
+generated: "2026-02-14T21:39:23.667559669Z"
