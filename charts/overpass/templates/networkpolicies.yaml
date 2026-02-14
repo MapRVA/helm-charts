@@ -1,0 +1,83 @@
+{{- if .Values.networkPolicies.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: overpass-network-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: overpass
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- if eq .Values.exposure.type "gateway" }}
+    - from:
+        - namespaceSelector:
+            {{- toYaml .Values.exposure.gateway.networkPolicy.namespaceSelector | nindent 12 }}
+          podSelector:
+            {{- toYaml .Values.exposure.gateway.networkPolicy.podSelector | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 80
+    {{- else if eq .Values.exposure.type "ingress" }}
+    - from:
+        - namespaceSelector:
+            {{- toYaml .Values.exposure.ingress.networkPolicy.namespaceSelector | nindent 12 }}
+          podSelector:
+            {{- toYaml .Values.exposure.ingress.networkPolicy.podSelector | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 80
+    {{- else if eq .Values.exposure.type "custom" }}
+    {{- range .Values.exposure.custom.networkPolicy }}
+    - from:
+        - namespaceSelector:
+            {{- toYaml .namespaceSelector | nindent 12 }}
+          {{- if .podSelector }}
+          podSelector:
+            {{- toYaml .podSelector | nindent 12 }}
+          {{- end }}
+      ports:
+        - protocol: TCP
+          port: 80
+    {{- end }}
+    {{- end }}
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicies.dns.namespace }}
+          podSelector:
+            {{- toYaml .Values.networkPolicies.dns.podSelector | nindent 12 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow external egress (for dataset downloads/updates)
+    {{- if .Values.networkPolicies.externalEgress.allowAll }}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    {{- else if .Values.networkPolicies.externalEgress.cidrs }}
+    {{- range .Values.networkPolicies.externalEgress.cidrs }}
+    - to:
+        - ipBlock:
+            cidr: {{ .cidr }}
+      ports:
+        {{- toYaml .ports | nindent 8 }}
+    {{- end }}
+    {{- end }}
+{{- end }}

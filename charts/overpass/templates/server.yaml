@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: overpass
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: overpass
+    component: server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: overpass
+      component: server
+  template:
+    metadata:
+      labels:
+        app: overpass
+        component: server
+    spec:
+      containers:
+        - name: overpass
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          ports:
+            - containerPort: 80
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: OVERPASS_META
+              value: {{ .Values.overpass.meta | quote }}
+            - name: OVERPASS_MODE
+              value: "init"
+            - name: OVERPASS_STOP_AFTER_INIT
+              value: "false"
+            - name: OVERPASS_PLANET_URL
+              value: {{ .Values.overpass.planetUrl | quote }}
+            - name: OVERPASS_DIFF_URL
+              value: {{ .Values.overpass.diffUrl | quote }}
+            - name: OVERPASS_RULES_LOAD
+              value: {{ .Values.overpass.rulesLoad | quote }}
+            - name: OVERPASS_ALLOW_DUPLICATE_QUERIES
+              value: {{ .Values.overpass.allowDuplicateQueries | quote }}
+            - name: OVERPASS_COMPRESSION
+              value: {{ .Values.overpass.compression | quote }}
+            - name: OVERPASS_UPDATE_SLEEP
+              value: {{ .Values.overpass.updateSleep | quote }}
+            - name: OVERPASS_PLANET_PREPROCESS
+              value: {{ .Values.overpass.planetPreprocess | quote }}
+          volumeMounts:
+            - name: overpass-data
+              mountPath: /db
+      volumes:
+        - name: overpass-data
+          persistentVolumeClaim:
+            claimName: overpass-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: overpass
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: overpass
+    component: server
+  ports:
+    - port: 80
+      targetPort: 80
+---
+{{- if eq .Values.exposure.type "ingress" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: overpass
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.exposure.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.exposure.ingress.className }}
+  ingressClassName: {{ .Values.exposure.ingress.className }}
+  {{- end }}
+  {{- if .Values.exposure.ingress.tls }}
+  tls:
+    {{- toYaml .Values.exposure.ingress.tls | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.exposure.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: overpass
+                port:
+                  number: 80
+          {{- end }}
+    {{- end }}
+{{- end }}
+---
+{{- if eq .Values.exposure.type "gateway" }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: overpass
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+    {{- toYaml .Values.exposure.gateway.parentRefs | nindent 4 }}
+  {{- if .Values.exposure.gateway.hostnames }}
+  hostnames:
+    {{- toYaml .Values.exposure.gateway.hostnames | nindent 4 }}
+  {{- end }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: overpass
+          port: 80
+{{- end }}

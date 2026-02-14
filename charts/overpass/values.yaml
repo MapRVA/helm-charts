@@ -1,0 +1,79 @@
+image:
+  repository: wiktorn/overpass-api
+  tag: "0.7.62"
+
+overpass:
+  meta: "yes"
+  planetUrl: "https://download.geofabrik.de/north-america/us/virginia-latest.osm.pbf"
+  diffUrl: "https://download.geofabrik.de/north-america/us/virginia-updates"
+  rulesLoad: "10"
+  allowDuplicateQueries: "yes"
+  compression: "gz"
+  updateSleep: "3600"
+  planetPreprocess: "mv /db/planet.osm.bz2 /db/planet.osm.pbf && osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf && rm /db/planet.osm.pbf"
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+  limits:
+      memory: "20Gi"
+    cpu: "1000m"
+
+storage:
+  storageClass: local-path
+  size: 30Gi
+
+exposure:
+  type: none
+
+  # Traditional Kubernetes Ingress configuration (used when type: ingress)
+  ingress:
+    className: ""
+    annotations: {}
+    hosts:
+      - host: overpass.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    # Network policy: which pods can send traffic to overpass
+    networkPolicy:
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+
+  # Gateway API configuration (used when type: gateway)
+  gateway:
+    parentRefs:
+      - name: eg
+        namespace: envoy-gateway-system
+    hostnames:
+      - overpass.example.com
+    # Network policy: which pods can send traffic to overpass
+    networkPolicy:
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: envoy-gateway-system
+      podSelector:
+        matchLabels:
+          gateway.envoyproxy.io/owning-gateway-name: eg
+
+  # Custom configuration (used when type: custom)
+  custom:
+    networkPolicy: []
+
+networkPolicies:
+  enabled: true
+
+  externalEgress:
+    allowAll: true
+
+  dns:
+    namespace: kube-system
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
