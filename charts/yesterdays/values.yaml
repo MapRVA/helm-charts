@@ -201,6 +201,14 @@ metrics:
   grafanaDashboard:
     title: "Yesterdays"
 
+  networkPolicy:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: monitoring
+    podSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus
+
   serviceMonitor:
     enabled: true
     namespace: ""  # Empty = same namespace as app

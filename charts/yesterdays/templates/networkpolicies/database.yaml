@@ -52,6 +52,17 @@ spec:
       ports:
         - protocol: TCP
           port: 5432
+    {{- if .Values.metrics.enabled }}
+    # Allow Prometheus to scrape metrics
+    - from:
+        - namespaceSelector:
+            {{- toYaml .Values.metrics.networkPolicy.namespaceSelector | nindent 12 }}
+          podSelector:
+            {{- toYaml .Values.metrics.networkPolicy.podSelector | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 9187
+    {{- end }}
     {{- if eq .Values.database.backend "cnpg" }}
     # Allow CNPG operator communication
     - from:
