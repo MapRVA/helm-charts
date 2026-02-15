@@ -13,10 +13,20 @@ spec:
         app: yesterdays-db-migration
     spec:
       restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: django
           image: {{ .Values.frontend.image }}
           imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           command:
             ["uv", "run", "manage.py", "migrate"]
           env:

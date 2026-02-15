@@ -25,6 +25,12 @@ spec:
         - name: celery-beat
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           command: ["/app/.venv/bin/celery"]
           args:
             - "-A"

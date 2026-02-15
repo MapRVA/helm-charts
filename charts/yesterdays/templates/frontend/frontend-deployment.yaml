@@ -21,6 +21,12 @@ spec:
         - name: django
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}

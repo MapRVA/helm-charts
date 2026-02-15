@@ -116,9 +116,19 @@ spec:
       labels:
         app: georeference-tool
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
       - name: postgres
         image: ghcr.io/maprva/cnpg-postgis-pgvector:17
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         ports:
         - containerPort: 5432
         env:
