@@ -87,12 +87,13 @@ spec:
           port: 53
     {{- if eq .Values.database.backend "cnpg" }}
     # Allow Kubernetes API server access (CNPG instance manager queries cluster resources)
+    # Uses the actual endpoint IP (not ClusterIP) since ipBlock is evaluated post-DNAT
     - to:
         - ipBlock:
             cidr: {{ .Values.networkPolicies.kubeApiServer.cidr }}
       ports:
         - protocol: TCP
-          port: 443
+          port: {{ .Values.networkPolicies.kubeApiServer.port }}
     # Allow cluster replication between CNPG instances
     - to:
         - podSelector:

@@ -67,7 +67,7 @@ exposure:
 
 # Network Policies for securing pod-to-pod and external communication
 networkPolicies:
-  enabled: true
+  enabled: false
 
   # External API egress configuration
   externalEgress:
@@ -81,10 +81,13 @@ networkPolicies:
     #       - port: 443
     #         protocol: TCP
 
-  # Kubernetes API server CIDR (needed by CNPG pods to query cluster resources)
-  # K3s default: 10.43.0.1/32, EKS: 172.20.0.1/32, etc.
+  # Kubernetes API server endpoint (needed by CNPG pods to query cluster resources)
+  # Use the actual API server endpoint IP, not the kubernetes ClusterIP —
+  # NetworkPolicy ipBlock rules are evaluated after DNAT, so the ClusterIP
+  # (e.g. 10.43.0.1) won't match. Find it with: kubectl get endpoints kubernetes -n default
   kubeApiServer:
-    cidr: "10.43.0.1/32"
+    cidr: "172.30.0.11/32"
+    port: 6443
 
   # DNS egress (required for all pods to resolve service names)
   dns:
