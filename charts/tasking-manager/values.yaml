@@ -48,6 +48,26 @@ settings:
   importMaxFilesize: "1000000"
   maxAoiArea: "5000"
 
+networkPolicies:
+  enabled: false
+
+  # Kubernetes API server endpoint (needed by CNPG pods to query cluster resources)
+  # Use the actual API server endpoint IP, not the kubernetes ClusterIP —
+  # NetworkPolicy ipBlock rules are evaluated after DNAT, so the ClusterIP
+  # (e.g. 10.43.0.1) won't match. Find it with: kubectl get endpoints kubernetes -n default
+  kubeApiServer:
+    cidr: "172.30.0.11/32"
+    port: 6443
+
+  # DNS egress (required for all pods to resolve service names)
+  dns:
+    # Namespace where CoreDNS/kube-dns runs
+    namespace: kube-system
+    # Labels to select DNS pods
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
+
 frontend:
   image: ghcr.io/maprva/frontend:941a235
   replicaCount: 1

@@ -1,0 +1,120 @@
+{{- if .Values.networkPolicies.enabled }}
+{{- if ne .Values.database.backend "none" }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-network-policy
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+spec:
+  podSelector:
+    matchLabels:
+      {{- if eq .Values.database.backend "cnpg" }}
+      cnpg.io/cluster: tasking-manager-db
+      {{- else }}
+      app: tasking-manager-db
+      {{- end }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow connections from backend
+    - from:
+        - podSelector:
+            matchLabels:
+              app: tasking-manager-backend
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow connections from cron jobs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: tasking-manager-cron
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow connections from migration job
+    - from:
+        - podSelector:
+            matchLabels:
+              app: tasking-manager-db-migration
+      ports:
+        - protocol: TCP
+          port: 5432
+    {{- if eq .Values.database.backend "cnpg" }}
+    # Allow CNPG operator communication
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cnpg-system
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 8000
+    # Allow cluster replication between CNPG instances
+    - from:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: tasking-manager-db
+      ports:
+        - protocol: TCP
+          port: 5432
+    {{- end }}
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicies.dns.namespace }}
+          podSelector:
+            {{- toYaml .Values.networkPolicies.dns.podSelector | nindent 12 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    {{- if eq .Values.database.backend "cnpg" }}
+    # Allow Kubernetes API server access (CNPG instance manager queries cluster resources)
+    # Uses the actual endpoint IP (not ClusterIP) since ipBlock is evaluated post-DNAT
+    - to:
+        - ipBlock:
+            cidr: {{ .Values.networkPolicies.kubeApiServer.cidr }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.networkPolicies.kubeApiServer.port }}
+    # Allow cluster replication between CNPG instances
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: tasking-manager-db
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow CNPG operator communication
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cnpg-system
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- if .Values.database.backup.enabled }}
+    # Allow S3 backup egress
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}

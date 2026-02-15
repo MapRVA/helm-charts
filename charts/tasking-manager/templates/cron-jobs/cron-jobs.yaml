@@ -8,6 +8,9 @@ spec:
     spec:
       ttlSecondsAfterFinished: 1800 # thirty minutes
       template:
+        metadata:
+          labels:
+            app: tasking-manager-cron
         spec:
           restartPolicy: OnFailure
           containers:

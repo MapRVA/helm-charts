@@ -8,6 +8,9 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 21600 # six hours
   template:
+    metadata:
+      labels:
+        app: tasking-manager-db-migration
     spec:
       restartPolicy: Never
       containers:
