@@ -81,6 +81,11 @@ networkPolicies:
     #       - port: 443
     #         protocol: TCP
 
+  # Kubernetes API server CIDR (needed by CNPG pods to query cluster resources)
+  # K3s default: 10.43.0.1/32, EKS: 172.20.0.1/32, etc.
+  kubeApiServer:
+    cidr: "10.43.0.1/32"
+
   # DNS egress (required for all pods to resolve service names)
   dns:
     # Namespace where CoreDNS/kube-dns runs
