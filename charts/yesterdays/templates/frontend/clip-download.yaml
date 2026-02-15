@@ -17,6 +17,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: django
           image: {{ .Values.frontend.image }}
