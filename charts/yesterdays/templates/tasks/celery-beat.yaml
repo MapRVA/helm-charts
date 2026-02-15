@@ -101,4 +101,10 @@ spec:
               value: {{ .Values.metadataRefresh.postpassTimeout | quote }}
             - name: METADATA_REFRESH_POSTPASS_BBOX
               value: {{ .Values.metadataRefresh.postpassBbox | quote }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

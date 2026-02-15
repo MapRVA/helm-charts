@@ -134,7 +134,11 @@ spec:
             - name: clip-cache
               mountPath: /app/models
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
             claimName: yesterdays-clip-cache
+        - name: tmp
+          emptyDir: {}

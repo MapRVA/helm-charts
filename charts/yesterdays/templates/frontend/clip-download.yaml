@@ -35,7 +35,11 @@ spec:
           volumeMounts:
             - name: clip-cache
               mountPath: /app/models
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
             claimName: yesterdays-clip-cache
+        - name: tmp
+          emptyDir: {}

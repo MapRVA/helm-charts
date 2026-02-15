@@ -128,6 +128,8 @@ spec:
             - name: clip-cache
               mountPath: /app/models
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
           ports:
             - name: http
               containerPort: 8000
@@ -137,3 +139,5 @@ spec:
         - name: clip-cache
           persistentVolumeClaim:
             claimName: yesterdays-clip-cache
+        - name: tmp
+          emptyDir: {}
