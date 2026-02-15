@@ -42,6 +42,8 @@ spec:
               value: {{ .Values.overpass.rulesLoad | quote }}
             - name: OVERPASS_ALLOW_DUPLICATE_QUERIES
               value: {{ .Values.overpass.allowDuplicateQueries | quote }}
+            - name: OVERPASS_USE_AREAS
+              value: {{ .Values.overpass.useAreas | quote }}
             - name: OVERPASS_COMPRESSION
               value: {{ .Values.overpass.compression | quote }}
             - name: OVERPASS_UPDATE_SLEEP

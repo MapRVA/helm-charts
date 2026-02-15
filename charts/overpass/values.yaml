@@ -9,6 +9,7 @@ overpass:
   rulesLoad: "10"
   allowDuplicateQueries: "yes"
   compression: "gz"
+  useAreas: "true"
   updateSleep: "3600"
   planetPreprocess: "mv /db/planet.osm.bz2 /db/planet.osm.pbf && osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf && rm /db/planet.osm.pbf"
 
