@@ -17,14 +17,16 @@ spec:
         app: yesterdays-celery-beat
     spec:
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: celery-beat
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
-          command: ["uv"]
+          command: ["/app/.venv/bin/celery"]
           args:
-            - "run"
-            - "celery"
             - "-A"
             - "yesterdays"
             - "beat"

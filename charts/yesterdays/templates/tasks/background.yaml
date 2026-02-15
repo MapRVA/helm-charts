@@ -19,14 +19,16 @@ spec:
         app: yesterdays-background-worker
     spec:
       terminationGracePeriodSeconds: 300
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: celery-worker
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
-          command: ["uv"]
+          command: ["/app/.venv/bin/celery"]
           args:
-            - "run"
-            - "celery"
             - "-A"
             - "yesterdays"
             - "worker"
