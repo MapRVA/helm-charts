@@ -52,6 +52,14 @@ spec:
       ports:
         - protocol: TCP
           port: 5432
+    # Allow connections from import
+    - from:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-import
+      ports:
+        - protocol: TCP
+          port: 5432
     {{- if .Values.metrics.enabled }}
     # Allow Prometheus to scrape metrics
     - from:
