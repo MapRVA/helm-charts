@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: yesterdays-frontend
+  name: yesterdays-import
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.frontend.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      app: yesterdays-frontend
+      app: yesterdays-import
   template:
     metadata:
       labels:
-        app: yesterdays-frontend
+        app: yesterdays-import
     spec:
       securityContext:
         runAsNonRoot: true
@@ -21,6 +21,7 @@ spec:
         - name: django
           image: {{ .Values.frontend.image }}
           imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          command: ["sleep", "infinity"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -61,20 +62,16 @@ spec:
                 secretKeyRef:
                   name: georef-db-app
                   key: password
-            - name: PROTOMAPS_API_KEY
-              value: {{.Values.protomaps.key }}
-            - name: OSM_ADMIN_USERNAMES
-              value: {{.Values.django.adminUsernames }}
-            - name: OSM_URL
-              value: {{ .Values.osm.serverUrl }}
-            - name: OSM_CLIENT_ID
-              value: {{ .Values.osm.clientId }}
-            - name: OSM_CLIENT_SECRET
-              value: {{ .Values.osm.clientSecret }}
-            - name: OSM_SECRET_KEY
-              value: {{ .Values.osm.secretKey }}
-            - name: OSM_LOGIN_REDIRECT_URI
-              value: {{ .Values.osm.redirectUri }}
+            - name: IMPORT_R2_PUBLIC_URL_BASE
+              value: {{ .Values.import.r2.publicUrlBase }}
+            - name: IMPORT_R2_BUCKET_NAME
+              value: {{ .Values.import.r2.bucketName }}
+            - name: IMPORT_R2_ACCESS_KEY_ID
+              value: {{ .Values.import.r2.accessKeyId }}
+            - name: IMPORT_R2_SECRET_ACCESS_KEY
+              value: {{ .Values.import.r2.secretAccessKey }}
+            - name: IMPORT_R2_ENDPOINT_URL
+              value: {{ .Values.import.r2.endpointUrl }}
             - name: RABBITMQ_HOST
               value: "yesterdays-rabbitmq.{{ .Release.Namespace }}.svc.cluster.local"
             - name: RABBITMQ_PORT
@@ -91,40 +88,25 @@ spec:
                   key: password
             - name: CELERY_BROKER_URL
               value: "amqp://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)//"
+            - name: FLICKR_API_KEY
+              value: {{ .Values.flickr.apiKey }}
+            - name: FLICKR_API_SECRET
+              value: {{ .Values.flickr.apiSecret }}
             - name: CLIP_WARMUP_ENABLED
-              value: "true"
-            {{- if .Values.metrics.enabled }}
-            - name: PROMETHEUS_ENABLED
-              value: "true"
-            {{- end }}
+              value: "false"
           resources:
             requests:
-              memory: "3500Mi"
+              memory: "500Mi"
               cpu: "500m"
             limits:
               memory: "4000Mi"
               cpu: "2000m"
-          readinessProbe:
-            httpGet:
-              path: /health/ready/
-              port: 8000
-              httpHeaders:
-                - name: Host
-                  value: localhost
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 12
           volumeMounts:
             - name: clip-cache
               mountPath: /app/models
               readOnly: true
             - name: tmp
               mountPath: /tmp
-          ports:
-            - name: http
-              containerPort: 8000
-            - name: metrics
-              containerPort: 9090
       volumes:
         - name: clip-cache
           persistentVolumeClaim:
