@@ -39,6 +39,14 @@ spec:
       ports:
         - protocol: TCP
           port: 5672
+    # Allow AMQP connections from import
+    - from:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-import
+      ports:
+        - protocol: TCP
+          port: 5672
     # Allow cluster peer communication (Erlang distribution + clustering)
     - from:
         - podSelector:
