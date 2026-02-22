@@ -6,7 +6,7 @@ metadata:
   name: {{ .Values.database.backup.objectStoreName }}
   namespace: {{ .Release.Namespace }}
   annotations:
-    "helm.sh/hook": pre-install
+    "helm.sh/hook": pre-install,pre-upgrade
 spec:
   configuration:
     destinationPath: {{ .Values.database.backup.s3Credentials.destinationPath }}
@@ -43,7 +43,7 @@ metadata:
   name: {{ .Values.database.recover.objectStoreName }}
   namespace: {{ .Release.Namespace }}
   annotations:
-    "helm.sh/hook": pre-install
+    "helm.sh/hook": pre-install,pre-upgrade
 spec:
   configuration:
     destinationPath: {{ .Values.database.recover.s3Credentials.destinationPath }}
@@ -65,7 +65,7 @@ metadata:
   name: tasking-manager-db
   namespace: {{ .Release.Namespace }}
   annotations:
-    "helm.sh/hook": pre-install
+    "helm.sh/hook": pre-install,pre-upgrade
 spec:
   instances: {{ .Values.database.replicas }}
   imageName: ghcr.io/cloudnative-pg/postgis:14-3.5
