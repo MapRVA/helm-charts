@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:8b7331e
+  image: ghcr.io/maprva/yesterdays:514e3d1
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -14,7 +14,7 @@ exposure:
 
   # Traditional Kubernetes Ingress configuration (used when type: ingress)
   ingress:
-    className: ""  # e.g., "nginx", "traefik"
+    className: "" # e.g., "nginx", "traefik"
     annotations: {}
       # cert-manager.io/cluster-issuer: letsencrypt-prod
       # nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -215,12 +215,12 @@ metrics:
 
   serviceMonitor:
     enabled: true
-    namespace: ""  # Empty = same namespace as app
+    namespace: "" # Empty = same namespace as app
     interval: "30s"
     scrapeTimeout: "10s"
     labels: {}
 
   prometheusRule:
-    enabled: false  # Enable when you want alerting
+    enabled: false # Enable when you want alerting
     namespace: ""
     labels: {}
