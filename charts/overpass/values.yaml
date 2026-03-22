@@ -5,21 +5,28 @@ image:
 overpass:
   meta: "yes"
   planetUrl: "https://download.geofabrik.de/north-america/us/virginia-latest.osm.pbf"
-  diffUrl: "https://download.geofabrik.de/north-america/us/virginia-updates"
+  diffUrl: "https://planet.openstreetmap.org/replication/minute/"
   rulesLoad: "10"
   allowDuplicateQueries: "yes"
   compression: "gz"
   useAreas: "true"
-  updateSleep: "3600"
-  planetPreprocess: "mv /db/planet.osm.bz2 /db/planet.osm.pbf && osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf && rm /db/planet.osm.pbf"
+  updateSleep: "60"
+  planetPreprocess: >-
+    mv /db/planet.osm.bz2 /db/planet.osm.pbf &&
+    osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf &&
+    rm /db/planet.osm.pbf
+  diffPreprocess: >-
+    mv /db/diffs/changes.osc /db/diffs/planet.osc &&
+    osmium extract -b -83.68,36.54,-75.24,39.47 /db/diffs/planet.osc -o /db/diffs/changes.osc --overwrite &&
+    rm /db/diffs/planet.osc
 
 resources:
   requests:
     memory: "2Gi"
-    cpu: "500m"
+    cpu: "300m"
   limits:
-    memory: "20Gi"
-    cpu: "1000m"
+    memory: "15Gi"
+    cpu: "3000m"
 
 storage:
   storageClass: local-path

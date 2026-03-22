@@ -50,6 +50,8 @@ spec:
               value: {{ .Values.overpass.updateSleep | quote }}
             - name: OVERPASS_PLANET_PREPROCESS
               value: {{ .Values.overpass.planetPreprocess | quote }}
+            - name: OVERPASS_DIFF_PREPROCESS
+              value: {{ .Values.overpass.diffPreprocess | quote }}
           volumeMounts:
             - name: overpass-data
               mountPath: /db
