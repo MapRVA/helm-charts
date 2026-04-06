@@ -2494,6 +2494,16 @@ entries:
   overpass:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-04-06T18:23:49.321805347Z"
+    description: A Helm chart for Kubernetes
+    digest: 4ca0c377fcda7b99bdaaf2067679b8589b02c6305dadceb61a458603e56e30f6
+    name: overpass
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/overpass-0.2.1/overpass-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-03-22T06:41:49.768572964Z"
     description: A Helm chart for Kubernetes
     digest: 6a5b2fc7261e9925b6afb22d96b22429cc222ba4bb067cc27e3e6e73d23ddfd2
@@ -2754,4 +2764,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
     version: 2.5.8
-generated: "2026-03-27T23:23:12.890536074Z"
+generated: "2026-04-06T18:23:49.322321078Z"
