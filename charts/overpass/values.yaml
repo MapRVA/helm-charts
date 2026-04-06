@@ -15,10 +15,6 @@ overpass:
     mv /db/planet.osm.bz2 /db/planet.osm.pbf &&
     osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf &&
     rm /db/planet.osm.pbf
-  diffPreprocess: >-
-    mv /db/diffs/changes.osc /db/diffs/planet.osc &&
-    osmium extract -b -83.68,36.54,-75.24,39.47 /db/diffs/planet.osc -o /db/diffs/changes.osc --overwrite &&
-    rm /db/diffs/planet.osc
 
 resources:
   requests:
@@ -31,6 +27,8 @@ resources:
 storage:
   storageClass: local-path
   size: 30Gi
+  # Bump to force a fresh database even if config hasn't changed
+  revision: "1"
 
 exposure:
   type: none

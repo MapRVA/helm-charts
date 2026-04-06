@@ -9,7 +9,10 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: overpass
@@ -48,17 +51,29 @@ spec:
               value: {{ .Values.overpass.compression | quote }}
             - name: OVERPASS_UPDATE_SLEEP
               value: {{ .Values.overpass.updateSleep | quote }}
+            {{- if .Values.overpass.planetPreprocess }}
             - name: OVERPASS_PLANET_PREPROCESS
               value: {{ .Values.overpass.planetPreprocess | quote }}
+            {{- end }}
+            {{- if .Values.overpass.diffPreprocess }}
             - name: OVERPASS_DIFF_PREPROCESS
               value: {{ .Values.overpass.diffPreprocess | quote }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 1000
           volumeMounts:
             - name: overpass-data
               mountPath: /db
       volumes:
         - name: overpass-data
           persistentVolumeClaim:
-            claimName: overpass-data-pvc
+            claimName: overpass-data-{{ include "overpass.dataHash" . }}
 ---
 apiVersion: v1
 kind: Service

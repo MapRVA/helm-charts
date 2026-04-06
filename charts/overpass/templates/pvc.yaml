@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: overpass-data-pvc
+  name: overpass-data-{{ include "overpass.dataHash" . }}
   namespace: {{ .Release.Namespace }}
 
 spec:
