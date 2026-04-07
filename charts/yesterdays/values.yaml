@@ -117,7 +117,7 @@ osm:
   serverUrl: https://www.openstreetmap.org
   clientId: <CLIENT ID>
   clientSecret: <CLIENT SECRET>
-  secretKey: <SECRET KEY>
+  secretKey: <SECRET KEY> # generate a 30-char "password" using a generator
   redirectUri: <REDIRECT URI>
 
 django:
