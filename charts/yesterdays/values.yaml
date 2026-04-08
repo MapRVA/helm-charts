@@ -118,7 +118,7 @@ osm:
   clientId: <CLIENT ID>
   clientSecret: <CLIENT SECRET>
   secretKey: <SECRET KEY> # generate a 30-char "password" using a generator
-  redirectUri: <REDIRECT URI>
+  redirectUri: <REDIRECT URI> # https://example.com/auth/callback/
 
 django:
   timeZone: "UTC"
