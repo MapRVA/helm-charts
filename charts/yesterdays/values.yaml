@@ -101,6 +101,8 @@ networkPolicies:
 tasks:
   background:
     replicaCount: 3
+  urgent:
+    replicaCount: 3
   beat:
     enabled: true
 
