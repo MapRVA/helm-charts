@@ -93,6 +93,10 @@ spec:
               value: "amqp://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)//"
             - name: CLIP_WARMUP_ENABLED
               value: "false"
+            - name: BEHIND_CLOUDFLARE_TUNNEL
+              value: "{{ .Values.django.behindCloudflareTunnel }}"
+            - name: DIRECTORIES_ENABLED
+              value: "{{ .Values.yesterdays.directories }}"
             {{- if .Values.metrics.enabled }}
             - name: PROMETHEUS_ENABLED
               value: "true"

@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:f6f4e67
+  image: ghcr.io/maprva/yesterdays:58fd94c
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -128,6 +128,10 @@ django:
   debug: "false"
   allowedHosts: <ALLOWED HOSTS>
   adminUsernames: <USERNAMES> # comma-separated list with no spaces
+  behindCloudflareTunnel: "false"
+
+yesterdays:
+  directories: "false"
 
 clip:
   storageClass: local-path
