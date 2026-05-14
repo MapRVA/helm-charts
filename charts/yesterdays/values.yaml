@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:8b3888d
+  image: ghcr.io/maprva/yesterdays:c30daf1
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -136,6 +136,21 @@ yesterdays:
 clip:
   storageClass: local-path
   size: 10Gi
+
+oxigraph:
+  image: ghcr.io/oxigraph/oxigraph:0.5.8
+  pullPolicy: IfNotPresent
+  timeout: 60
+  storage:
+    storageClass: local-path
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
 
 database:
   backend: cnpg # this can be "cnpg", "simple", or "none"

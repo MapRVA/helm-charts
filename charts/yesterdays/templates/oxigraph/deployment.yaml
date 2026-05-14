@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subjects-oxigraph
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: subjects-oxigraph
+  template:
+    metadata:
+      labels:
+        app: subjects-oxigraph
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+        - name: oxigraph
+          image: {{ .Values.oxigraph.image }}
+          imagePullPolicy: {{ .Values.oxigraph.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          args:
+            - serve
+            - --location
+            - /data
+            - --bind
+            - 0.0.0.0:7878
+            - --union-default-graph
+          ports:
+            - name: http
+              containerPort: 7878
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: {{ .Values.oxigraph.resources.requests.cpu }}
+              memory: {{ .Values.oxigraph.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.oxigraph.resources.limits.cpu }}
+              memory: {{ .Values.oxigraph.resources.limits.memory }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7878
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7878
+            initialDelaySeconds: 30
+            periodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: subjects-oxigraph-data
