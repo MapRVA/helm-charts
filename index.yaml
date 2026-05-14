@@ -3,6 +3,16 @@ entries:
   georeference-tool:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-05-14T05:10:57.010999336Z"
+    description: A Helm chart for Yesterdays
+    digest: 45c7f8d225b096b22f3c0fb9981285f4c6904b811f301485a445bb443889efd3
+    name: georeference-tool
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/georeference-tool-3.12.0-alpha.2/georeference-tool-3.12.0-alpha.2.tgz
+    version: 3.12.0-alpha.2
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-05-13T10:22:04.265178126Z"
     description: A Helm chart for Yesterdays
     digest: db8418ce813711d82d7f90c09a1c27ab365db360414b13fa3913f46820814633
@@ -2934,4 +2944,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
     version: 2.5.8
-generated: "2026-05-13T10:22:04.26640701Z"
+generated: "2026-05-14T05:10:57.01235499Z"
