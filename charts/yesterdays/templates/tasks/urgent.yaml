@@ -41,6 +41,7 @@ spec:
             - "--loglevel=info"
             - "-Q"
             - "urgent"
+            - "--concurrency=1"
             - "--max-tasks-per-child=100"
           env:
             - name: CLIP_WARMUP_ENABLED
