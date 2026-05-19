@@ -191,6 +191,9 @@ database:
 protomaps:
   key: MY_PROTOMAPS_KEY
 
+openrouter:
+  key: MY_OPENROUTER_KEY
+
 flickr:
   apiKey: ""
   apiSecret: ""
