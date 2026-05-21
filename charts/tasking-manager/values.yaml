@@ -69,12 +69,12 @@ networkPolicies:
         k8s-app: kube-dns
 
 frontend:
-  image: ghcr.io/maprva/frontend:941a235
+  image: ghcr.io/maprva/frontend:64725c8
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
 backend:
-  image: ghcr.io/maprva/backend:941a235
+  image: ghcr.io/maprva/backend:64725c8
   replicaCount: 1
   imagePullPolicy: IfNotPresent
 
