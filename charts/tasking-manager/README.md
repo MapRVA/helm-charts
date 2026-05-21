@@ -53,3 +53,15 @@ UPDATE users set role = 1, email_address = 'email@jacobhall.net', is_email_verif
 ```
 UPDATE banner SET visible=false;
 ```
+
+## Updating the CNPG database spec
+
+The `Cluster`, `ObjectStore`, and `ScheduledBackup` resources are deliberately annotated with `helm.sh/hook: pre-install` only — not `pre-upgrade`. Helm's default hook delete policy is `before-hook-creation`, which would delete and recreate the `Cluster` on every upgrade, wiping the PVCs along with it. Restricting the hook to `pre-install` means Helm creates these resources on the initial install and then leaves the running database alone on subsequent upgrades.
+
+The trade-off is that changes to the `Cluster` spec inside the chart (CNPG image bumps, replica count, postgres parameters, etc.) do **not** propagate via `helm upgrade`. To apply them, edit the live resource directly:
+
+```
+kubectl edit cluster.postgresql.cnpg.io tasking-manager-db -n <NAMESPACE>
+```
+
+The CNPG operator will reconcile the change in place.
