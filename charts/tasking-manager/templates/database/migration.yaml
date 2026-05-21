@@ -13,6 +13,17 @@ spec:
         app: tasking-manager-db-migration
     spec:
       restartPolicy: Never
+      initContainers:
+        - name: wait-for-db
+          image: postgres:14-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h tasking-manager-db-rw.{{ .Release.Namespace }}.svc.cluster.local -p 5432 -U tm; do
+                echo "Waiting for postgres to accept connections..."
+                sleep 2
+              done
       containers:
         - name: db-migrator
           image: {{ .Values.backend.image }}
