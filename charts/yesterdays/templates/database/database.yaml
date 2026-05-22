@@ -69,6 +69,34 @@ metadata:
 spec:
   instances: {{ .Values.database.replicas }}
   imageName: ghcr.io/maprva/cnpg-postgis-pgvector:17
+  resources:
+    requests:
+      cpu: {{ .Values.database.resources.requests.cpu }}
+      memory: {{ .Values.database.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.database.resources.limits.cpu }}
+      memory: {{ .Values.database.resources.limits.memory }}
+  # PGTune inputs: PG 17, Linux, Mixed, 1GB RAM, 1 CPU, 100 connections, SSD (NVMe).
+  # effective_io_concurrency is set to 500 (vs. PGTune's 1000 for NVMe) to account
+  # for consumer NVMe behind VM passthrough — splits the difference with SATA SSD (200).
+  # Re-run https://pgtune.leopard.in.ua/ if the resources block above changes.
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "256MB"
+      effective_cache_size: "768MB"
+      maintenance_work_mem: "64MB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "7864kB"
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "500"
+      work_mem: "4MB"
+      huge_pages: "off"
+      jit: "off"
+      wal_compression: "lz4"
+      min_wal_size: "1GB"
+      max_wal_size: "4GB"
   {{- if .Values.database.recover.enabled }}
   bootstrap:
     recovery:

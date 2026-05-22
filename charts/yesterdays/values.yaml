@@ -156,6 +156,16 @@ database:
   backend: cnpg # this can be "cnpg", "simple", or "none"
   name: georeference-tool
   replicas: 3 # only works with cnpg backend
+  # Resources only apply to the cnpg backend. PGTune parameters in
+  # templates/database/database.yaml are tuned for 1Gi memory — re-run PGTune
+  # if you change the target sizing.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: 500m
+      memory: 2Gi
   storage:
     storageClass: local-path
     size: 50Gi
