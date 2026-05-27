@@ -1,0 +1,30 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.cnpg.clusterName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.cnpg.instances }}
+  imageName: {{ .Values.cnpg.imageName }}
+  # The schema Job needs the superuser secret to create the postgrest_auth role.
+  enableSuperuserAccess: true
+  resources:
+    {{- toYaml .Values.cnpg.resources | nindent 4 }}
+  postgresql:
+    parameters:
+      {{- range $k, $v := .Values.cnpg.parameters }}
+      {{ $k }}: {{ $v | quote }}
+      {{- end }}
+  bootstrap:
+    initdb:
+      database: {{ .Values.cnpg.database.name }}
+      owner: {{ .Values.cnpg.database.owner }}
+      postInitTemplateSQL:
+        - CREATE EXTENSION IF NOT EXISTS postgis;
+        - CREATE EXTENSION IF NOT EXISTS hstore;
+        - CREATE ROLE postgrest_reader NOLOGIN;
+  storage:
+    storageClass: {{ .Values.cnpg.storage.storageClass }}
+    size: {{ .Values.cnpg.storage.size }}

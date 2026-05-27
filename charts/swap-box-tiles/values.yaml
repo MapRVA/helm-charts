@@ -1,0 +1,116 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# CNPG (CloudNativePG) cluster configuration.
+# The cluster hosts the filtered OSM extract and the swapbox_v1 / freshness functions.
+cnpg:
+  clusterName: swapbox-db
+  imageName: ghcr.io/cloudnative-pg/postgis:17
+  instances: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  storage:
+    storageClass: local-path
+    size: 10Gi
+  database:
+    name: osm
+    owner: osm_writer
+  # PostgreSQL parameters. Tuned for ~1Gi memory; rerun PGTune if resources change.
+  parameters:
+    max_connections: "100"
+    shared_buffers: "256MB"
+
+# osm2pgsql-swapbox image — used by the bootstrap Job and replication Deployment.
+osm2pgsql:
+  image: ghcr.io/maprva/osm2pgsql-swapbox:3c15ff9
+  pullPolicy: IfNotPresent
+  planet:
+    url: https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
+  bootstrap:
+    # Sized for the streaming pipeline buffers plus the filtered PBF (a few MB).
+    workDirSize: 5Gi
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
+      limits:
+        memory: 4Gi
+  replication:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+
+# Martin vector tile server (https://martin.maplibre.org/).
+martin:
+  image: ghcr.io/maplibre/martin:v0.14.2
+  pullPolicy: IfNotPresent
+  replicaCount: 2
+  workerProcesses: 4
+  poolSize: 20
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+# PostgREST exposes the freshness() function as JSON.
+postgrest:
+  image: postgrest/postgrest:v12.2.0
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  # Password for the postgrest_auth login role. Generate a 30+ char password.
+  dbPassword: <POSTGREST AUTH PASSWORD>
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+
+# Exposure configuration (mirrors the yesterdays chart).
+# type: "none" | "ingress" | "gateway" | "custom"
+exposure:
+  type: none
+
+  # Traditional Kubernetes Ingress (used when type: ingress).
+  # Two Ingress resources are emitted: one for Martin at /swapbox_v1, one for
+  # PostgREST at /freshness. Path-rewrite is controller-specific — supply the
+  # right annotations for your controller (example: nginx rewrite-target).
+  ingress:
+    className: ""
+    host: tiles.swapboxmap.example
+    tls: []
+    # Annotations applied to BOTH Ingress resources.
+    annotations: {}
+    # Annotations applied only to the /freshness Ingress (e.g. rewrite to /rpc/freshness).
+    freshnessAnnotations: {}
+      # nginx.ingress.kubernetes.io/rewrite-target: /rpc/freshness
+
+  # Gateway API HTTPRoute (used when type: gateway).
+  # Emits a single HTTPRoute with two rules: /swapbox_v1 → martin, /freshness → postgrest
+  # (with a URLRewrite filter that rewrites the prefix to /rpc/freshness).
+  gateway:
+    parentRefs:
+      - name: eg
+        namespace: envoy-gateway-system
+    hostnames:
+      - tiles.swapboxmap.example
+
+  # No resources are created. Bring your own ingress/gateway pointing at the
+  # martin and postgrest Services.
+  custom: {}

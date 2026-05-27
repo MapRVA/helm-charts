@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "swapbox.fullname" . }}-bootstrap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: bootstrap
+  annotations:
+    # Bootstrap only runs on first install. Re-running osm2pgsql --create against
+    # an existing CNPG cluster would drop and re-import the swapbox_nodes table.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        {{- include "swapbox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: bootstrap
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        # The image runs as USER nobody; fsGroup makes the /work emptyDir writable.
+        fsGroup: 65534
+      initContainers:
+        - name: wait-for-db
+          image: postgres:17-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE"; do
+                echo "Waiting for database..."
+                sleep 2
+              done
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: host
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: username
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: dbname
+      containers:
+        - name: bootstrap
+          image: {{ .Values.osm2pgsql.image }}
+          imagePullPolicy: {{ .Values.osm2pgsql.pullPolicy }}
+          command: ["/usr/local/bin/bootstrap.sh"]
+          env:
+            - name: PLANET_URL
+              value: {{ .Values.osm2pgsql.planet.url | quote }}
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: host
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: port
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: password
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: dbname
+          volumeMounts:
+            - name: work
+              mountPath: /work
+          resources:
+            {{- toYaml .Values.osm2pgsql.bootstrap.resources | nindent 12 }}
+      volumes:
+        - name: work
+          emptyDir:
+            sizeLimit: {{ .Values.osm2pgsql.bootstrap.workDirSize }}

@@ -1,0 +1,66 @@
+{{- if eq .Values.exposure.type "ingress" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "swapbox.fullname" . }}-martin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: martin
+  {{- with .Values.exposure.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.exposure.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.exposure.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.exposure.ingress.host | quote }}
+      http:
+        paths:
+          - path: /swapbox_v1
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "swapbox.fullname" . }}-martin
+                port:
+                  number: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "swapbox.fullname" . }}-postgrest
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgrest
+  annotations:
+    {{- /* Merge the common ingress annotations with the freshness-specific
+           ones (typically a rewrite-target so /freshness lands at /rpc/freshness). */}}
+    {{- $merged := merge (dict) .Values.exposure.ingress.freshnessAnnotations .Values.exposure.ingress.annotations }}
+    {{- toYaml $merged | nindent 4 }}
+spec:
+  {{- with .Values.exposure.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.exposure.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.exposure.ingress.host | quote }}
+      http:
+        paths:
+          - path: /freshness
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "swapbox.fullname" . }}-postgrest
+                port:
+                  number: 3000
+{{- end }}

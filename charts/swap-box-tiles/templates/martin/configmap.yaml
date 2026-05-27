@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "swapbox.fullname" . }}-martin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: martin
+data:
+  martin.yaml: |
+    listen_addresses: '0.0.0.0:3000'
+    worker_processes: {{ .Values.martin.workerProcesses }}
+    postgres:
+      connection_string: ${DATABASE_URL}
+      pool_size: {{ .Values.martin.poolSize }}
+      # Only expose the function explicitly listed below.
+      auto_publish: false
+      functions:
+        swapbox_v1:
+          schema: public
+          function: swapbox_v1
+          minzoom: 0
+          maxzoom: 18
+          bounds: [-180.0, -85.05, 180.0, 85.05]

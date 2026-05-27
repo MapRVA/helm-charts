@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "swapbox.fullname" . }}-replication
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: replication
+spec:
+  replicas: 1
+  # Never run two osm2pgsql-replication processes at once.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "swapbox.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: replication
+  template:
+    metadata:
+      labels:
+        {{- include "swapbox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: replication
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+        - name: replication
+          image: {{ .Values.osm2pgsql.image }}
+          imagePullPolicy: {{ .Values.osm2pgsql.pullPolicy }}
+          command: ["/usr/local/bin/replicate.sh"]
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: host
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: port
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: password
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: dbname
+          resources:
+            {{- toYaml .Values.osm2pgsql.replication.resources | nindent 12 }}

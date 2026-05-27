@@ -1,0 +1,6 @@
+apiVersion: v2
+name: swap-box-tiles
+description: Vector tiles and freshness endpoint for Swap Box Map.
+type: application
+version: 0.1.0
+appVersion: "3c15ff9"

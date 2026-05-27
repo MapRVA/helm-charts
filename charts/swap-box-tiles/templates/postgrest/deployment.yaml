@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "swapbox.fullname" . }}-postgrest
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgrest
+spec:
+  replicas: {{ .Values.postgrest.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "swapbox.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: postgrest
+  template:
+    metadata:
+      labels:
+        {{- include "swapbox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: postgrest
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+        - name: postgrest
+          image: {{ .Values.postgrest.image }}
+          imagePullPolicy: {{ .Values.postgrest.pullPolicy }}
+          env:
+            - name: PGRST_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.postgrestSecret" . }}
+                  key: password
+            # Read from -ro so freshness queries don't hit the primary.
+            - name: PGRST_DB_URI
+              value: "postgres://postgrest_auth:$(PGRST_DB_PASSWORD)@{{ include "swapbox.dbHostRO" . }}:5432/{{ .Values.cnpg.database.name }}"
+            - name: PGRST_DB_SCHEMAS
+              value: public
+            - name: PGRST_DB_ANON_ROLE
+              value: postgrest_reader
+            - name: PGRST_OPENAPI_MODE
+              value: disabled
+            - name: PGRST_SERVER_CORS_ALLOWED_ORIGINS
+              value: "*"
+          ports:
+            - name: http
+              containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /rpc/freshness
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 60
+          resources:
+            {{- toYaml .Values.postgrest.resources | nindent 12 }}

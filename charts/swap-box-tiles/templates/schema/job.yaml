@@ -1,0 +1,107 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "swapbox.fullname" . }}-schema
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "swapbox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: schema
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "20"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        {{- include "swapbox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: schema
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      initContainers:
+        # Wait for the bootstrap Job to have populated swapbox_nodes. Without
+        # this the CREATE INDEX in schema.sql races against osm2pgsql --create.
+        - name: wait-for-bootstrap
+          image: {{ .Values.osm2pgsql.image }}
+          imagePullPolicy: {{ .Values.osm2pgsql.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              until psql -tAc "SELECT to_regclass('public.swapbox_nodes')" | grep -q swapbox_nodes; do
+                echo "Waiting for swapbox_nodes table..."
+                sleep 5
+              done
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: host
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: password
+            - name: PGDATABASE
+              value: {{ .Values.cnpg.database.name | quote }}
+      containers:
+        - name: schema
+          image: {{ .Values.osm2pgsql.image }}
+          imagePullPolicy: {{ .Values.osm2pgsql.pullPolicy }}
+          # schema.sql is baked into the osm2pgsql-swapbox image alongside the
+          # osm2pgsql flex style — schema changes ship with image bumps.
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              # Create or update the postgrest_auth login role.
+              psql -v ON_ERROR_STOP=1 -v "pgr_password=${POSTGREST_PASSWORD}" <<'EOSQL'
+              SELECT 'CREATE USER postgrest_auth'
+              WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'postgrest_auth')
+              \gexec
+              ALTER USER postgrest_auth WITH PASSWORD :'pgr_password';
+              GRANT postgrest_reader TO postgrest_auth;
+              EOSQL
+              # Apply the canonical schema from the image (idempotent).
+              psql -v ON_ERROR_STOP=1 -f /etc/osm2pgsql/schema.sql
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: host
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: port
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbSuperuserSecret" . }}
+                  key: password
+            - name: PGDATABASE
+              value: {{ .Values.cnpg.database.name | quote }}
+            - name: POSTGREST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.postgrestSecret" . }}
+                  key: password
