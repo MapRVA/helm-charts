@@ -27,6 +27,43 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
         runAsGroup: 65534
+      initContainers:
+        # Hold the pod in Init until the database is reachable AND the schema
+        # Job has created swapbox_v1. Avoids CrashLoopBackOff during install
+        # while the CNPG cluster initdbs and the bootstrap Job imports the
+        # planet extract (which can take 20–30 minutes).
+        - name: wait-for-schema
+          image: postgres:17-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE"; do
+                echo "Waiting for database..."
+                sleep 5
+              done
+              until psql -tAc "SELECT 1 FROM pg_proc WHERE proname = 'swapbox_v1'" | grep -q 1; do
+                echo "Waiting for swapbox_v1 function..."
+                sleep 10
+              done
+          env:
+            - name: PGHOST
+              value: {{ include "swapbox.dbHostRead" . | quote }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: password
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "swapbox.dbAppSecret" . }}
+                  key: dbname
       containers:
         - name: martin
           image: {{ .Values.martin.image }}
@@ -43,9 +80,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "swapbox.dbAppSecret" . }}
                   key: password
-            # Read from the -ro service so tile load can scale across replicas.
             - name: DATABASE_URL
-              value: "postgres://$(PGUSER):$(PGPASSWORD)@{{ include "swapbox.dbHostRO" . }}:5432/{{ .Values.cnpg.database.name }}"
+              value: "postgres://$(PGUSER):$(PGPASSWORD)@{{ include "swapbox.dbHostRead" . }}:5432/{{ .Values.cnpg.database.name }}"
           ports:
             - name: http
               containerPort: 3000

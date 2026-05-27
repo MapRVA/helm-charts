@@ -53,10 +53,11 @@ Hostname of the CNPG read-write service.
 {{- end }}
 
 {{/*
-Hostname of the CNPG read-only service.
+Hostname of the CNPG any-instance read service. Targets the primary plus any
+replicas — unlike the -ro service this still has endpoints when instances: 1.
 */}}
-{{- define "swapbox.dbHostRO" -}}
-{{- printf "%s-ro" .Values.cnpg.clusterName -}}
+{{- define "swapbox.dbHostRead" -}}
+{{- printf "%s-r" .Values.cnpg.clusterName -}}
 {{- end }}
 
 {{/*
