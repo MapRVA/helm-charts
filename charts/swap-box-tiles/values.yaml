@@ -27,7 +27,7 @@ cnpg:
 
 # osm2pgsql-swapbox image — used by the bootstrap Job and replication Deployment.
 osm2pgsql:
-  image: ghcr.io/maprva/osm2pgsql-swapbox:3c15ff9
+  image: ghcr.io/maprva/osm2pgsql-swapbox:924fa1d
   pullPolicy: IfNotPresent
   planet:
     url: https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
