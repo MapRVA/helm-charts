@@ -23,53 +23,107 @@ spec:
         app: overpass
         component: server
     spec:
+      # b1tw153/overpass-api runs as UID 10001 and does not chown its volume.
+      # The PVC must already be owned by 10001:10001 — see README.
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+      # SIGKILL during an in-flight DB write can corrupt the database; the
+      # b1tw153 docs call for ~600s of grace.
+      terminationGracePeriodSeconds: 600
+      initContainers:
+        - name: init-db
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              if [ -f /opt/overpass/db/.init-complete ]; then
+                echo "Overpass DB already initialized, skipping init."
+                exit 0
+              fi
+              {{- if eq .Values.overpass.init.mode "clone" }}
+              /opt/overpass/bin/download_clone.sh \
+                --source="$CLONE_SOURCE" \
+                --meta="$OVERPASS_META_MODE"
+              {{- else }}
+              /opt/overpass/bin/import_osm_data.sh \
+                --data-source="$IMPORT_OSM_DATA_SOURCE" \
+                --diff-url="$OVERPASS_DIFF_URL" \
+                --meta="$OVERPASS_META_MODE" \
+                --compression-method="$IMPORT_OSM_COMPRESSION_METHOD"
+              {{- end }}
+              touch /opt/overpass/db/.init-complete
+          env:
+            - name: OVERPASS_META_MODE
+              value: {{ .Values.overpass.metaMode | quote }}
+            - name: OVERPASS_DIFF_URL
+              value: {{ .Values.overpass.diffUrl | quote }}
+            {{- if eq .Values.overpass.init.mode "clone" }}
+            - name: CLONE_SOURCE
+              value: {{ .Values.overpass.init.cloneSource | quote }}
+            {{- else }}
+            - name: IMPORT_OSM_DATA_SOURCE
+              value: {{ .Values.overpass.init.dataSource | quote }}
+            - name: IMPORT_OSM_COMPRESSION_METHOD
+              value: {{ .Values.overpass.init.compressionMethod | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: overpass-data
+              mountPath: /opt/overpass/db
       containers:
         - name: overpass
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: OVERPASS_META
-              value: {{ .Values.overpass.meta | quote }}
-            - name: OVERPASS_MODE
-              value: "init"
-            - name: OVERPASS_STOP_AFTER_INIT
-              value: "false"
-            - name: OVERPASS_PLANET_URL
-              value: {{ .Values.overpass.planetUrl | quote }}
+            - name: OVERPASS_META_MODE
+              value: {{ .Values.overpass.metaMode | quote }}
             - name: OVERPASS_DIFF_URL
               value: {{ .Values.overpass.diffUrl | quote }}
-            - name: OVERPASS_RULES_LOAD
-              value: {{ .Values.overpass.rulesLoad | quote }}
-            - name: OVERPASS_ALLOW_DUPLICATE_QUERIES
+            - name: OVERPASS_AREAS
+              value: {{ .Values.overpass.areas | quote }}
+            - name: OVERPASS_REPLICATE_ID
+              value: {{ .Values.overpass.replicateId | quote }}
+            - name: DISPATCHER_ALLOW_DUPLICATE_QUERIES
               value: {{ .Values.overpass.allowDuplicateQueries | quote }}
-            - name: OVERPASS_USE_AREAS
-              value: {{ .Values.overpass.useAreas | quote }}
-            - name: OVERPASS_COMPRESSION
-              value: {{ .Values.overpass.compression | quote }}
-            - name: OVERPASS_UPDATE_SLEEP
-              value: {{ .Values.overpass.updateSleep | quote }}
-            {{- if .Values.overpass.planetPreprocess }}
-            - name: OVERPASS_PLANET_PREPROCESS
-              value: {{ .Values.overpass.planetPreprocess | quote }}
+            {{- if .Values.overpass.updateFrequency }}
+            - name: OVERPASS_UPDATE_FREQUENCY
+              value: {{ .Values.overpass.updateFrequency | quote }}
             {{- end }}
-            {{- if .Values.overpass.diffPreprocess }}
-            - name: OVERPASS_DIFF_PREPROCESS
-              value: {{ .Values.overpass.diffPreprocess | quote }}
+            {{- if .Values.overpass.areaUpdateTime }}
+            - name: AREA_UPDATE_TIME
+              value: {{ .Values.overpass.areaUpdateTime | quote }}
             {{- end }}
+            {{- if .Values.overpass.backupTime }}
+            - name: OVERPASS_BACKUP_TIME
+              value: {{ .Values.overpass.backupTime | quote }}
+            {{- end }}
+            {{- if .Values.overpass.backupDay }}
+            - name: OVERPASS_BACKUP_DAY
+              value: {{ .Values.overpass.backupDay | quote }}
+            {{- end }}
+            {{- if .Values.overpass.dispatcherBaseSpace }}
+            - name: DISPATCHER_BASE_SPACE
+              value: {{ .Values.overpass.dispatcherBaseSpace | quote }}
+            {{- end }}
+          # Use /liveness — the baked-in /api/status healthcheck can flap during
+          # shutdown and long batches per the b1tw153 docs.
           readinessProbe:
             httpGet:
-              path: /api/status
-              port: 80
+              path: /liveness
+              port: 8080
             initialDelaySeconds: 30
             periodSeconds: 30
             timeoutSeconds: 5
             failureThreshold: 1000
           volumeMounts:
             - name: overpass-data
-              mountPath: /db
+              mountPath: /opt/overpass/db
       volumes:
         - name: overpass-data
           persistentVolumeClaim:
@@ -87,7 +141,7 @@ spec:
     component: server
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
 ---
 {{- if eq .Values.exposure.type "ingress" }}
 apiVersion: networking.k8s.io/v1

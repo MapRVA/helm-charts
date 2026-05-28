@@ -20,7 +20,7 @@ spec:
             {{- toYaml .Values.exposure.gateway.networkPolicy.podSelector | nindent 12 }}
       ports:
         - protocol: TCP
-          port: 80
+          port: 8080
     {{- else if eq .Values.exposure.type "ingress" }}
     - from:
         - namespaceSelector:
@@ -29,7 +29,7 @@ spec:
             {{- toYaml .Values.exposure.ingress.networkPolicy.podSelector | nindent 12 }}
       ports:
         - protocol: TCP
-          port: 80
+          port: 8080
     {{- else if eq .Values.exposure.type "custom" }}
     {{- range .Values.exposure.custom.networkPolicy }}
     - from:
@@ -41,7 +41,7 @@ spec:
           {{- end }}
       ports:
         - protocol: TCP
-          port: 80
+          port: 8080
     {{- end }}
     {{- end }}
   egress:

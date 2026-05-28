@@ -1,20 +1,41 @@
 image:
-  repository: wiktorn/overpass-api
-  tag: "0.7.62"
+  repository: b1tw153/overpass-api
+  tag: "0.7.62.11-r9"
 
 overpass:
-  meta: "yes"
-  planetUrl: "https://download.geofabrik.de/north-america/us/virginia-latest.osm.pbf"
-  diffUrl: "https://planet.openstreetmap.org/replication/minute/"
-  rulesLoad: "10"
-  allowDuplicateQueries: "yes"
-  compression: "gz"
-  useAreas: "true"
-  updateSleep: "60"
-  planetPreprocess: >-
-    mv /db/planet.osm.bz2 /db/planet.osm.pbf &&
-    osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf &&
-    rm /db/planet.osm.pbf
+  # One-time DB initialization. Runs as an initContainer; skipped on subsequent
+  # pod starts if the DB on the PVC is already populated.
+  init:
+    # mode: import | clone
+    #   import: load a planet/extract file (PBF, .osm.bz2) via import_osm_data.sh
+    #   clone:  copy an existing DB from another Overpass server via download_clone.sh
+    mode: import
+    # Used when mode: import. PBF is supported natively (no preprocess needed).
+    dataSource: "https://download.geofabrik.de/north-america/us/virginia-latest.osm.pbf"
+    # Used when mode: clone.
+    cloneSource: "http://dev.overpass-api.de/api_drolbr/"
+    # Compression for the on-disk DB. lz4 | gz | no
+    compressionMethod: "lz4"
+
+  metaMode: "yes"                          # was OVERPASS_META
+  diffUrl: "https://download.geofabrik.de/north-america/us/virginia-updates/"
+  areas: "yes"                             # was OVERPASS_USE_AREAS (value form changed)
+  # Diff polling interval in seconds. Leave unset for auto-detect from
+  # Last-Modified. Virginia's Geofabrik stream is hourly.
+  updateFrequency: "3600"
+  replicateId: "auto"
+  # b1tw153 default is "yes"; wiktorn was "no". Set explicitly.
+  allowDuplicateQueries: "no"
+  # Optional: schedule area-update runs at a fixed HH:MM (UTC). Leave blank to
+  # run on every DB update.
+  areaUpdateTime: ""
+  # Optional periodic backups (requires the backup volume below).
+  backupTime: ""       # e.g. "03:00"
+  backupDay: ""        # e.g. "sun" for weekly; blank = daily when backupTime set
+
+  # Optional: cap dispatcher base space (bytes). Leave blank to auto-derive
+  # from the container memory limit (80%).
+  dispatcherBaseSpace: ""
 
 resources:
   requests:
@@ -27,7 +48,9 @@ resources:
 storage:
   storageClass: local-path
   size: 30Gi
-  # Bump to force a fresh database even if config hasn't changed
+  # Bump to force a fresh database even if config hasn't changed.
+  # NOTE: the resulting PVC must be chown'd to UID/GID 10001 by the operator
+  # before the pod starts. See README.
   revision: "1"
 
 exposure:
