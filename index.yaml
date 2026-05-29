@@ -2924,6 +2924,16 @@ entries:
     version: 0.1.0
   swap-box-tiles:
   - apiVersion: v2
+    appVersion: 247f57b
+    created: "2026-05-29T05:47:49.835944612Z"
+    description: Vector tiles and freshness endpoint for Swap Box Map.
+    digest: 314de3b2e6626e4d426529da1cafb3d83914a2719a567b8e646b704406b940f3
+    name: swap-box-tiles
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/swap-box-tiles-0.5.0/swap-box-tiles-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: 924fa1d
     created: "2026-05-28T06:39:39.445869299Z"
     description: Vector tiles and freshness endpoint for Swap Box Map.
@@ -3235,4 +3245,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
     version: 2.5.8
-generated: "2026-05-28T21:21:58.470408145Z"
+generated: "2026-05-29T05:47:49.83639309Z"
