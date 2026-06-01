@@ -17,15 +17,15 @@ overpass:
     # Compression for the on-disk DB. lz4 | gz | no
     compressionMethod: "lz4"
 
-  metaMode: "yes"                          # was OVERPASS_META
-  diffUrl: "https://download.geofabrik.de/north-america/us/virginia-updates/"
-  areas: "yes"                             # was OVERPASS_USE_AREAS (value form changed)
+  metaMode: "yes"
+  diffUrl: "https://planet.openstreetmap.org/replication/minute/"
+  areas: "yes"
   # Diff polling interval in seconds. Leave unset for auto-detect from
   # Last-Modified. Virginia's Geofabrik stream is hourly.
-  updateFrequency: "3600"
+  updateFrequency: "60"
   replicateId: "auto"
   # b1tw153 default is "yes"; wiktorn was "no". Set explicitly.
-  allowDuplicateQueries: "no"
+  allowDuplicateQueries: "yes"
   # Optional: schedule area-update runs at a fixed HH:MM (UTC). Leave blank to
   # run on every DB update.
   areaUpdateTime: ""
