@@ -43,8 +43,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "swapbox.dbAppSecret" . }}
                   key: password
+            # libpq keyword/value form, not a URI: passwords containing
+            # URI-reserved characters (@ : / ? # %) would otherwise bleed into
+            # the host field and break connection parsing.
             - name: DATABASE_URL
-              value: "postgres://$(PGUSER):$(PGPASSWORD)@{{ include "swapbox.dbHostRead" . }}:5432/{{ .Values.cnpg.database.name }}"
+              value: "host={{ include "swapbox.dbHostRead" . }} port=5432 dbname={{ .Values.cnpg.database.name }} user=$(PGUSER) password=$(PGPASSWORD)"
           ports:
             - name: http
               containerPort: 3000

@@ -74,6 +74,8 @@ postgrest:
   pullPolicy: IfNotPresent
   replicaCount: 1
   # Password for the postgrest_auth login role. Generate a 30+ char password.
+  # The connection string uses libpq keyword/value form, so URI-reserved
+  # characters (@ : / ? # %) are safe; avoid spaces and single quotes.
   dbPassword: <POSTGREST AUTH PASSWORD>
   resources:
     requests:

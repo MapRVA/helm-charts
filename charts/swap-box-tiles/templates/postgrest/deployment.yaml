@@ -32,8 +32,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "swapbox.postgrestSecret" . }}
                   key: password
+            # libpq keyword/value form, not a URI: passwords containing
+            # URI-reserved characters (@ : / ? # %) would otherwise bleed into
+            # the host field and break connection parsing.
             - name: PGRST_DB_URI
-              value: "postgres://postgrest_auth:$(PGRST_DB_PASSWORD)@{{ include "swapbox.dbHostRead" . }}:5432/{{ .Values.cnpg.database.name }}"
+              value: "host={{ include "swapbox.dbHostRead" . }} port=5432 dbname={{ .Values.cnpg.database.name }} user=postgrest_auth password=$(PGRST_DB_PASSWORD)"
             - name: PGRST_DB_SCHEMAS
               value: public
             - name: PGRST_DB_ANON_ROLE
