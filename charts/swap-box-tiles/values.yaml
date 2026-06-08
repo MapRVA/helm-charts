@@ -27,7 +27,7 @@ cnpg:
 
 # osm2pgsql-swapbox image — used by the bootstrap Job and replication Deployment.
 osm2pgsql:
-  image: ghcr.io/maprva/osm2pgsql-swapbox:982ec12
+  image: ghcr.io/maprva/osm2pgsql-swapbox:d05dcd0
   pullPolicy: IfNotPresent
   planet:
     url: https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
@@ -50,7 +50,7 @@ osm2pgsql:
 
 # Martin vector tile server (https://martin.maplibre.org/).
 martin:
-  image: ghcr.io/maplibre/martin:v0.14.2
+  image: ghcr.io/maplibre/martin:v1.10.1
   pullPolicy: IfNotPresent
   replicaCount: 2
   workerProcesses: 4
