@@ -50,7 +50,7 @@ osm2pgsql:
 
 # Martin vector tile server (https://martin.maplibre.org/).
 martin:
-  image: ghcr.io/maplibre/martin:v1.10.1
+  image: ghcr.io/maplibre/martin:1.10.1
   pullPolicy: IfNotPresent
   replicaCount: 2
   workerProcesses: 4
