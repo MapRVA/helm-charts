@@ -1,6 +1,6 @@
 image:
   repository: b1tw153/overpass-api
-  tag: "0.7.62.11-r9"
+  tag: "0.7.62.11-r10"
 
 overpass:
   # One-time DB initialization. Runs as an initContainer; skipped on subsequent
