@@ -27,7 +27,7 @@ cnpg:
 
 # osm2pgsql-swapbox image — used by the bootstrap Job and replication Deployment.
 osm2pgsql:
-  image: ghcr.io/maprva/osm2pgsql-swapbox:d05dcd0
+  image: ghcr.io/maprva/osm2pgsql-swapbox:18ab4ab
   pullPolicy: IfNotPresent
   planet:
     url: https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf
@@ -46,7 +46,10 @@ osm2pgsql:
         cpu: 100m
         memory: 256Mi
       limits:
-        memory: 1Gi
+        # Headroom above the bounded --max-diff-size chunks in replicate.sh.
+        # Steady-state minute updates use far less; the extra room absorbs
+        # larger catch-up chunks after a fresh bootstrap without OOMing.
+        memory: 2Gi
 
 # Martin vector tile server (https://martin.maplibre.org/).
 martin:
