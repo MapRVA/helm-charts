@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:d548564
+  image: ghcr.io/maprva/yesterdays:b40ba6e
   pullPolicy: IfNotPresent
   replicaCount: 3
 
