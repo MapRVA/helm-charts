@@ -1,0 +1,15 @@
+{{- if .Values.overpass.staticFiles }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: overpass-static
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: overpass
+    component: server
+data:
+  {{- range $name, $content := .Values.overpass.staticFiles }}
+  {{ $name | quote }}: |
+    {{- $content | nindent 4 }}
+  {{- end }}
+{{- end }}

@@ -1,6 +1,6 @@
 image:
   repository: b1tw153/overpass-api
-  tag: "0.7.62.11-r10"
+  tag: "0.7.62.11-r13"
 
 overpass:
   # One-time DB initialization. Runs as an initContainer; skipped on subsequent
@@ -36,6 +36,48 @@ overpass:
   # Optional: cap dispatcher base space (bytes). Leave blank to auto-derive
   # from the container memory limit (80%).
   dispatcherBaseSpace: ""
+
+  # Static files served by nginx at the web root from /opt/overpass/static.
+  # Each key becomes a file overlaid into that directory via a subPath mount,
+  # so you only replace the files you list — the image's baked-in defaults
+  # (robots.txt, llms.txt) stay in place for anything you omit. Best for small
+  # text files (index.html, robots.txt); a ConfigMap caps at ~1Mi and binary
+  # assets become awkward — use extraVolumes below for those.
+  # Editing these rolls the pod (subPath mounts don't live-update).
+  #
+  # This chart ships a minimal default index.html landing page (below). Replace
+  # it with your own markup, add more files (e.g. a custom robots.txt), or drop
+  # the landing page entirely with `index.html: null`.
+  staticFiles:
+    index.html: |
+      <!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>MapRVA Overpass Chart</title>
+        </head>
+        <body>
+          <h1>MapRVA Overpass Chart</h1>
+          <p>You have successfully installed the MapRVA
+            <a href="https://github.com/MapRVA/helm-charts/tree/main/charts/overpass">Overpass Helm chart</a>.</p>
+          <p>This is an Overpass API server. Send queries to
+            <a href="/api/interpreter">/api/interpreter</a>.</p>
+        </body>
+      </html>
+
+# Generic pod-level volume passthrough for anything staticFiles can't express:
+# a pre-built ConfigMap/Secret, a PVC holding large or binary web assets, etc.
+# extraVolumeMounts are added to the overpass (nginx) container.
+extraVolumes: []
+# extraVolumes:
+#   - name: landing-assets
+#     configMap:
+#       name: my-overpass-landing
+extraVolumeMounts: []
+# extraVolumeMounts:
+#   - name: landing-assets
+#     mountPath: /opt/overpass/static/assets
+#     readOnly: true
 
 resources:
   requests:

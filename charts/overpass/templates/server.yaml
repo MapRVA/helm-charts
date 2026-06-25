@@ -22,6 +22,12 @@ spec:
       labels:
         app: overpass
         component: server
+      {{- if .Values.overpass.staticFiles }}
+      annotations:
+        # subPath mounts don't live-update when the ConfigMap changes, so roll
+        # the pod whenever the static content does.
+        checksum/static: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- end }}
     spec:
       # b1tw153/overpass-api runs as UID 10001 and does not chown its volume.
       # The PVC must already be owned by 10001:10001 — see README.
@@ -124,10 +130,30 @@ spec:
           volumeMounts:
             - name: overpass-data
               mountPath: /opt/overpass/db
+            {{- range $name, $content := .Values.overpass.staticFiles }}
+            # Per-file subPath overlay: replaces this one file in the image's
+            # /opt/overpass/static dir while leaving the baked-in defaults
+            # (robots.txt, llms.txt, ...) in place.
+            - name: overpass-static
+              mountPath: /opt/overpass/static/{{ $name }}
+              subPath: {{ $name }}
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
       volumes:
         - name: overpass-data
           persistentVolumeClaim:
             claimName: overpass-data-{{ include "overpass.dataHash" . }}
+        {{- if .Values.overpass.staticFiles }}
+        - name: overpass-static
+          configMap:
+            name: overpass-static
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
