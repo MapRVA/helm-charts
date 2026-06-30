@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:ee6e1b8
+  image: ghcr.io/maprva/yesterdays:47e1c0e
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -138,7 +138,7 @@ clip:
   size: 10Gi
 
 oxigraph:
-  image: ghcr.io/oxigraph/oxigraph:0.5.8
+  image: ghcr.io/oxigraph/oxigraph:0.5.9
   pullPolicy: IfNotPresent
   timeout: 60
   storage:
