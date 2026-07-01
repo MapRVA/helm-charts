@@ -76,18 +76,21 @@ spec:
     limits:
       cpu: {{ .Values.database.resources.limits.cpu }}
       memory: {{ .Values.database.resources.limits.memory }}
-  # PGTune inputs: PG 17, Linux, Mixed, 1GB RAM, 1 CPU, 100 connections, SSD (NVMe).
-  # effective_io_concurrency is set to 500 (vs. PGTune's 1000 for NVMe) to account
-  # for consumer NVMe behind VM passthrough — splits the difference with SATA SSD (200).
+  # PGTune inputs: PG 17, Linux, Mixed, 4GB RAM, 2 CPU, 100 connections, SSD (NVMe).
+  # Two deliberate deviations from PGTune output:
+  #   - effective_io_concurrency: 500 (vs. PGTune's 1000 for NVMe) to account for
+  #     consumer NVMe behind VM passthrough — splits the difference with SATA SSD (200).
+  #   - work_mem: held at 4MB (below PGTune's suggestion) to bound worst-case exposure
+  #     at 100 connections (100 * 4MB = 400MB) against 1GB shared_buffers / 4GB limit.
   # Re-run https://pgtune.leopard.in.ua/ if the resources block above changes.
   postgresql:
     parameters:
       max_connections: "100"
-      shared_buffers: "256MB"
-      effective_cache_size: "768MB"
-      maintenance_work_mem: "64MB"
+      shared_buffers: "1GB"
+      effective_cache_size: "3GB"
+      maintenance_work_mem: "256MB"
       checkpoint_completion_target: "0.9"
-      wal_buffers: "7864kB"
+      wal_buffers: "16MB"
       default_statistics_target: "100"
       random_page_cost: "1.1"
       effective_io_concurrency: "500"
@@ -97,6 +100,11 @@ spec:
       wal_compression: "lz4"
       min_wal_size: "1GB"
       max_wal_size: "4GB"
+      max_parallel_workers_per_gather: "1"
+      max_parallel_workers: "2"
+      max_parallel_maintenance_workers: "1"
+    shared_preload_libraries:
+      - pg_stat_statements
   {{- if .Values.database.recover.enabled }}
   bootstrap:
     recovery:
