@@ -1,4 +1,9 @@
 {{- if eq .Values.database.backend "cnpg" }}
+# NOTE: The Cluster and ObjectStore resources in this file are pre-install
+# hooks, so Helm only creates them on first install. Changes here do NOT reach
+# existing clusters via `helm upgrade` — apply spec changes to live clusters
+# manually (e.g. kubectl patch, keeping parity with this template) until the
+# hooks are removed in the next major release of this chart.
 {{- if .Values.database.backup.enabled }}
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore

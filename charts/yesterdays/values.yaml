@@ -159,9 +159,12 @@ database:
   # Resources only apply to the cnpg backend. PGTune parameters in
   # templates/database/database.yaml are tuned for 4Gi memory / 2 CPU — re-run PGTune
   # if you change the target sizing.
+  # CPU requests are kept low on purpose: throttling is governed by the limit,
+  # and per-instance rolling replacements must still schedule on nodes whose
+  # CPU requests are already mostly allocated.
   resources:
     requests:
-      cpu: 1
+      cpu: 500m
       memory: 2Gi
     limits:
       cpu: 2
