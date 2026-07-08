@@ -101,8 +101,24 @@ networkPolicies:
 tasks:
   background:
     replicaCount: 3
+    # Prefork child processes per worker pod. Without an explicit value,
+    # Celery defaults to the node's CPU count — each child is a full
+    # Django process.
+    concurrency: 2
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 2Gi
   urgent:
-    replicaCount: 3
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2560Mi
+      limits:
+        memory: 3584Mi
   beat:
     enabled: true
 

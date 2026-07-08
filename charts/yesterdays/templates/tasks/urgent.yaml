@@ -137,6 +137,8 @@ spec:
               value: {{ .Values.metadataRefresh.postpassTimeout | quote }}
             - name: METADATA_REFRESH_POSTPASS_BBOX
               value: {{ .Values.metadataRefresh.postpassBbox | quote }}
+          resources:
+            {{- toYaml .Values.tasks.urgent.resources | nindent 12 }}
           volumeMounts:
             - name: clip-cache
               mountPath: /app/models
