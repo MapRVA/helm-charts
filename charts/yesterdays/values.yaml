@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:9c8a100
+  image: ghcr.io/maprva/yesterdays:6823ee0
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -117,8 +117,12 @@ tasks:
       requests:
         cpu: 500m
         memory: 2560Mi
+      # Steady state is ~2.5Gi, but clip.load() transiently holds both the
+      # JIT archive and the constructed model during warmup — measured
+      # cgroup memory.peak of 4835Mi. The limit must clear that or the
+      # worker OOM-crashloops at startup.
       limits:
-        memory: 3584Mi
+        memory: 6Gi
   beat:
     enabled: true
 
