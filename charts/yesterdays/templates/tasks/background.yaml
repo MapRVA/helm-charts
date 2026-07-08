@@ -44,6 +44,15 @@ spec:
             - "--concurrency={{ .Values.tasks.background.concurrency }}"
             - "--max-tasks-per-child=100"
           env:
+            # libvips defaults its thread pool to the node's CPU count; cap
+            # it so a single tiling job doesn't fan out across every core.
+            - name: VIPS_CONCURRENCY
+              value: "2"
+            # Cap glibc malloc arenas so memory freed by libvips' worker
+            # threads is reused instead of stranded at each arena's high
+            # watermark.
+            - name: MALLOC_ARENA_MAX
+              value: "2"
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}
             - name: DJANGO_SECRET_KEY
