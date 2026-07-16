@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:6823ee0
+  image: ghcr.io/maprva/yesterdays:a63a814
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -156,7 +156,7 @@ yesterdays:
 # CLIP embedding microservice (semantic search). Required by the app; the
 # model is baked into the image, so no weights download or PVC is needed.
 clip:
-  image: ghcr.io/maprva/yesterdays-clip:latest
+  image: ghcr.io/maprva/yesterdays-clip:7ac0900
   pullPolicy: IfNotPresent
   replicaCount: 1
 
