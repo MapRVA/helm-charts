@@ -3,6 +3,7 @@ kind: RabbitmqCluster
 metadata:
   name: yesterdays-rabbitmq
 spec:
+  image: rabbitmq:4.2.8-management
   replicas: 3
   resources:
     requests:
