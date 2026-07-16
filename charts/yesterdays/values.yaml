@@ -107,22 +107,19 @@ tasks:
     concurrency: 2
     resources:
       requests:
-        cpu: 200m
+        cpu: 50m
         memory: 512Mi
       limits:
+        cpu: 1000m
         memory: 2Gi
   urgent:
     replicaCount: 2
     resources:
       requests:
-        cpu: 500m
-        memory: 2560Mi
-      # Steady state is ~2.5Gi, but clip.load() transiently holds both the
-      # JIT archive and the constructed model during warmup — measured
-      # cgroup memory.peak of 4835Mi. The limit must clear that or the
-      # worker OOM-crashloops at startup.
+        cpu: 300m
+        memory: 1Gi
       limits:
-        memory: 6Gi
+        memory: 2Gi
   beat:
     enabled: true
 
@@ -197,7 +194,7 @@ oxigraph:
     size: 10Gi
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 1Gi
     limits:
       cpu: 1000m
