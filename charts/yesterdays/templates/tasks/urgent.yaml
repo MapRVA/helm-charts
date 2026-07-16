@@ -44,8 +44,6 @@ spec:
             - "--concurrency=1"
             - "--max-tasks-per-child=100"
           env:
-            - name: CLIP_WARMUP_ENABLED
-              value: "true"
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}
             - name: DJANGO_SECRET_KEY
@@ -140,14 +138,8 @@ spec:
           resources:
             {{- toYaml .Values.tasks.urgent.resources | nindent 12 }}
           volumeMounts:
-            - name: clip-cache
-              mountPath: /app/models
-              readOnly: true
             - name: tmp
               mountPath: /tmp
       volumes:
-        - name: clip-cache
-          persistentVolumeClaim:
-            claimName: yesterdays-clip-cache
         - name: tmp
           emptyDir: {}

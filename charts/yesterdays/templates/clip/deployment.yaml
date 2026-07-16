@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yesterdays-clip
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.clip.replicaCount }}
+  selector:
+    matchLabels:
+      app: yesterdays-clip
+  template:
+    metadata:
+      labels:
+        app: yesterdays-clip
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        {{- if .Values.clip.gpu.enabled }}
+        # Added so the container can open the node's render device
+        # (/dev/dri/renderD*) exposed by the Intel GPU device plugin.
+        supplementalGroups:
+          - {{ .Values.clip.gpu.renderGroupId }}
+        {{- end }}
+      {{- with .Values.clip.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: clip
+          image: {{ .Values.clip.image }}
+          imagePullPolicy: {{ .Values.clip.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          env:
+            # The text tower always runs on CPU so query vectors match across
+            # GPU and CPU-only deployments; the vision tower follows visionDevice.
+            - name: CLIP_TEXT_DEVICE
+              value: {{ .Values.clip.textDevice | quote }}
+            - name: CLIP_VISION_DEVICE
+              value: {{ .Values.clip.visionDevice | quote }}
+            # OpenVINO compiled-kernel cache lives on the tmp emptyDir (the
+            # root filesystem is read-only). Hardware-specific, so never baked
+            # into the image.
+            - name: CLIP_CACHE_DIR
+              value: /tmp/ov-cache
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: {{ .Values.clip.resources.requests.cpu }}
+              memory: {{ .Values.clip.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.clip.resources.limits.cpu }}
+              memory: {{ .Values.clip.resources.limits.memory }}
+              {{- if .Values.clip.gpu.enabled }}
+              gpu.intel.com/i915: "{{ .Values.clip.gpu.count }}"
+              {{- end }}
+          # Model load + OpenVINO kernel compilation can take a while on first
+          # start (especially GPU without a warm cache). The startup probe
+          # gates traffic until /readyz reports the model is loaded and warmed.
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

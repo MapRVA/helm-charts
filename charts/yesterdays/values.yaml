@@ -153,9 +153,40 @@ django:
 yesterdays:
   directories: "false"
 
+# CLIP embedding microservice (semantic search). Required by the app; the
+# model is baked into the image, so no weights download or PVC is needed.
 clip:
-  storageClass: local-path
-  size: 10Gi
+  image: ghcr.io/maprva/yesterdays-clip:latest
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+
+  # OpenVINO device selection per tower. AUTO picks GPU when present
+  # (Intel-only for now via the intel-device-plugins operator)
+  textDevice: AUTO
+  visionDevice: AUTO
+
+  # Intel GPU acceleration via the intel-device-plugins operator. Leave
+  # disabled for CPU-only inference.
+  gpu:
+    enabled: false
+    # Number of gpu.intel.com/i915 devices to request.
+    count: 1
+    # GID of the node's `render` group, added as a supplemental group so the
+    # container can open /dev/dri/renderD*. Find it on the GPU node with
+    # `getent group render`.
+    renderGroupId: 110
+
+  # Pin the service to particular nodes (e.g. the GPU node). Requesting the
+  # i915 resource already constrains scheduling; use this for finer control.
+  nodeSelector: {}
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
 
 oxigraph:
   image: ghcr.io/oxigraph/oxigraph:0.5.9

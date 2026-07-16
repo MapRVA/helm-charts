@@ -52,6 +52,14 @@ spec:
       ports:
         - protocol: TCP
           port: 7878
+    # Allow connection to the CLIP embedding service (generate_embeddings)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-clip
+      ports:
+        - protocol: TCP
+          port: 8000
     # Allow external API egress (Flickr, R2, etc.)
     {{- if .Values.networkPolicies.externalEgress.allowAll }}
     - to:

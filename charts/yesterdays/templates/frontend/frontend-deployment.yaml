@@ -105,8 +105,8 @@ spec:
               value: "http://subjects-oxigraph.{{ .Release.Namespace }}.svc.cluster.local:7878"
             - name: OXIGRAPH_TIMEOUT
               value: {{ .Values.oxigraph.timeout | quote }}
-            - name: CLIP_WARMUP_ENABLED
-              value: "false"
+            - name: CLIP_SERVICE_URL
+              value: "http://yesterdays-clip.{{ .Release.Namespace }}.svc.cluster.local:8000"
             - name: BEHIND_CLOUDFLARE_TUNNEL
               value: "{{ .Values.django.behindCloudflareTunnel }}"
             - name: DIRECTORIES_ENABLED

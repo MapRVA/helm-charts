@@ -96,8 +96,8 @@ spec:
               value: {{ .Values.flickr.apiKey }}
             - name: FLICKR_API_SECRET
               value: {{ .Values.flickr.apiSecret }}
-            - name: CLIP_WARMUP_ENABLED
-              value: "false"
+            - name: CLIP_SERVICE_URL
+              value: "http://yesterdays-clip.{{ .Release.Namespace }}.svc.cluster.local:8000"
           resources:
             requests:
               memory: "500Mi"
@@ -106,14 +106,8 @@ spec:
               memory: "4000Mi"
               cpu: "2000m"
           volumeMounts:
-            - name: clip-cache
-              mountPath: /app/models
-              readOnly: true
             - name: tmp
               mountPath: /tmp
       volumes:
-        - name: clip-cache
-          persistentVolumeClaim:
-            claimName: yesterdays-clip-cache
         - name: tmp
           emptyDir: {}

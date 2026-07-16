@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: clip-download-network-policy
+  name: clip-network-policy
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
@@ -10,14 +10,30 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: yesterdays-clip-download
+      app: yesterdays-clip
   policyTypes:
     - Ingress
     - Egress
-  ingress: []
-    # CLIP download job receives no inbound traffic
+  ingress:
+    # Allow connections from frontend (semantic search queries)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-frontend
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow connections from import (generate_embeddings backfill)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-import
+      ports:
+        - protocol: TCP
+          port: 8000
   egress:
-    # Allow DNS resolution
+    # Allow DNS resolution. The service makes no other outbound connections —
+    # the model is baked into the image, so no egress to R2/HuggingFace.
     - to:
         - namespaceSelector:
             matchLabels:
@@ -29,15 +45,4 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Allow HTTPS egress for downloading CLIP models from HuggingFace/etc.
-    - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
-      ports:
-        - protocol: TCP
-          port: 443
 {{- end }}
