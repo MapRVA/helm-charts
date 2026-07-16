@@ -28,6 +28,9 @@ spec:
               drop:
                 - ALL
           env:
+            # Cap glibc malloc arenas
+            - name: MALLOC_ARENA_MAX
+              value: "2"
             - name: DJANGO_TIME_ZONE
               value: {{ .Values.django.timeZone }}
             - name: DJANGO_SECRET_KEY
