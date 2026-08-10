@@ -104,10 +104,10 @@ spec:
                   key: password
             - name: CELERY_BROKER_URL
               value: "amqp://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)//"
-            - name: OXIGRAPH_URL
-              value: "http://subjects-oxigraph.{{ .Release.Namespace }}.svc.cluster.local:7878"
-            - name: OXIGRAPH_TIMEOUT
-              value: {{ .Values.oxigraph.timeout | quote }}
+            - name: MEMGRAPH_URL
+              value: "bolt://{{ .Release.Name }}-memgraph.{{ .Release.Namespace }}.svc.cluster.local:7687"
+            - name: MEMGRAPH_TIMEOUT
+              value: {{ .Values.graph.timeout | quote }}
             - name: CLIP_SERVICE_URL
               value: "http://yesterdays-clip.{{ .Release.Namespace }}.svc.cluster.local:8000"
             - name: BEHIND_CLOUDFLARE_TUNNEL

@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:76f5eee
+  image: ghcr.io/maprva/yesterdays:4cf0e90
   pullPolicy: IfNotPresent
   replicaCount: 3
 
@@ -185,20 +185,47 @@ clip:
       cpu: "2"
       memory: 4Gi
 
-oxigraph:
-  image: ghcr.io/oxigraph/oxigraph:0.5.9
-  pullPolicy: IfNotPresent
+# Bolt client settings for the app's connection to Memgraph, which holds the
+# Wikidata subject mirror. The Memgraph server itself is configured under
+# `memgraph:` below.
+graph:
   timeout: 60
-  storage:
-    storageClass: local-path
-    size: 10Gi
+
+# Values for the upstream memgraph/memgraph subchart. Metrics are wired through
+# this chart's `metrics:` block rather than the subchart's own ServiceMonitor —
+# see templates/memgraph/servicemonitor.yaml.
+memgraph:
+  # Serve metrics in OpenMetrics format on port 9091 and expose that port on the
+  # Service, so Prometheus scrapes Memgraph directly instead of via mg-exporter.
+  # Requires Memgraph >= 3.11; harmless when nothing is scraping.
+  scrapeMemgraphDirectly: true
+
+  prometheus:
+    enabled: false # no mg-exporter sidecar deployment
+    namespace: "" # empty = release namespace
+    serviceMonitor:
+      enabled: false # this chart owns the ServiceMonitor
+    grafanaDashboard:
+      # Unlike the ServiceMonitor, this is a subchart value and so cannot follow
+      # metrics.enabled — the dashboard ConfigMap renders unconditionally.
+      enabled: true
+
+  persistentVolumeClaim:
+    storageClassName: local-path
+    storageSize: 10Gi
+    logStorageClassName: local-path
+    logStorageSize: 1Gi
+
+  # Memgraph holds the whole graph in memory, so the mirror must fit in RAM.
+  # If you also set --memory-limit via memgraphConfig, keep it below the pod
+  # limit so Memgraph raises a query exception instead of being OOM-killed.
   resources:
     requests:
-      cpu: 50m
-      memory: 1Gi
-    limits:
-      cpu: 1000m
+      cpu: 500m
       memory: 2Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
 
 database:
   backend: cnpg # this can be "cnpg", "simple", or "none"

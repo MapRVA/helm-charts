@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: oxigraph-network-policy
+  name: memgraph-network-policy
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
@@ -10,51 +10,63 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: subjects-oxigraph
+      app.kubernetes.io/name: memgraph
+      app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Ingress
     - Egress
   ingress:
-    # Allow connections from frontend
+    # Allow Bolt connections from frontend
     - from:
         - podSelector:
             matchLabels:
               app: yesterdays-frontend
       ports:
         - protocol: TCP
-          port: 7878
-    # Allow connections from background workers
+          port: 7687
+    # Allow Bolt connections from background workers
     - from:
         - podSelector:
             matchLabels:
               app: yesterdays-background-worker
       ports:
         - protocol: TCP
-          port: 7878
-    # Allow connections from urgent workers
+          port: 7687
+    # Allow Bolt connections from urgent workers
     - from:
         - podSelector:
             matchLabels:
               app: yesterdays-urgent-worker
       ports:
         - protocol: TCP
-          port: 7878
-    # Allow connections from celery-beat
+          port: 7687
+    # Allow Bolt connections from celery-beat
     - from:
         - podSelector:
             matchLabels:
               app: yesterdays-celery-beat
       ports:
         - protocol: TCP
-          port: 7878
-    # Allow connections from import
+          port: 7687
+    # Allow Bolt connections from import
     - from:
         - podSelector:
             matchLabels:
               app: yesterdays-import
       ports:
         - protocol: TCP
-          port: 7878
+          port: 7687
+    {{- if .Values.metrics.enabled }}
+    # Allow Prometheus to scrape the OpenMetrics endpoint
+    - from:
+        - namespaceSelector:
+            {{- toYaml .Values.metrics.networkPolicy.namespaceSelector | nindent 12 }}
+          podSelector:
+            {{- toYaml .Values.metrics.networkPolicy.podSelector | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 9091
+    {{- end }}
   egress:
     # Allow DNS resolution
     - to:

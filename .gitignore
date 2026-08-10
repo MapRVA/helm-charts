@@ -1,2 +1,5 @@
 my-*.yaml
 /.zed
+
+# Subchart tarballs pulled by `helm dependency update`; pinned via Chart.lock
+charts/*/charts/
