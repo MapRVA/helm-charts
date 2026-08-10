@@ -23,3 +23,7 @@ the upstream chart. Two exceptions are worth knowing about:
   disabled, and this chart creates the ServiceMonitor.
 - **The Grafana dashboard** (`memgraph.prometheus.grafanaDashboard.enabled`) is a subchart value, so
   it cannot follow `metrics.enabled` and renders unconditionally.
+- **`memgraph.fullnameOverride`** is pinned to `yesterdays-memgraph` and the app templates address
+  the Service by that name, so don't change it. It also works around an upstream bug: the subchart
+  truncates its generated name to 63 characters and *then* appends suffixes like `-lib-storage`,
+  which produces invalid volume names under a long release name.

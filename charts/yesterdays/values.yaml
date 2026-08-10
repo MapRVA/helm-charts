@@ -195,6 +195,12 @@ graph:
 # this chart's `metrics:` block rather than the subchart's own ServiceMonitor —
 # see templates/memgraph/servicemonitor.yaml.
 memgraph:
+  # Pin the resource names. Without this the subchart derives them from the
+  # release name, and it appends suffixes like "-lib-storage" *after* truncating
+  # to 63 chars — so a long release name produces invalid volume names. The
+  # templates here address the Service by this exact name.
+  fullnameOverride: yesterdays-memgraph
+
   # Serve metrics in OpenMetrics format on port 9091 and expose that port on the
   # Service, so Prometheus scrapes Memgraph directly instead of via mg-exporter.
   # Requires Memgraph >= 3.11; harmless when nothing is scraping.

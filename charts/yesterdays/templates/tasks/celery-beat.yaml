@@ -89,7 +89,7 @@ spec:
             - name: CELERY_BROKER_URL
               value: "amqp://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)//"
             - name: MEMGRAPH_URL
-              value: "bolt://{{ .Release.Name }}-memgraph.{{ .Release.Namespace }}.svc.cluster.local:7687"
+              value: "bolt://yesterdays-memgraph.{{ .Release.Namespace }}.svc.cluster.local:7687"
             - name: MEMGRAPH_TIMEOUT
               value: {{ .Values.graph.timeout | quote }}
             - name: METADATA_REFRESH_WIKIDATA_INTERVAL
