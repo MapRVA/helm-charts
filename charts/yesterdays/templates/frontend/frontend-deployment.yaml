@@ -119,12 +119,7 @@ spec:
               value: "true"
             {{- end }}
           resources:
-            requests:
-              memory: "3500Mi"
-              cpu: "500m"
-            limits:
-              memory: "4000Mi"
-              cpu: "2000m"
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
           readinessProbe:
             httpGet:
               path: /health/ready/
