@@ -132,6 +132,8 @@ spec:
               value: "bolt://yesterdays-memgraph.{{ .Release.Namespace }}.svc.cluster.local:7687"
             - name: MEMGRAPH_TIMEOUT
               value: {{ .Values.graph.timeout | quote }}
+            - name: CLIP_SERVICE_URL
+              value: "http://yesterdays-clip.{{ .Release.Namespace }}.svc.cluster.local:8000"
             - name: METADATA_REFRESH_WIKIDATA_INTERVAL
               value: {{ .Values.metadataRefresh.wikidataInterval | quote }}
             - name: METADATA_REFRESH_OSM_INTERVAL

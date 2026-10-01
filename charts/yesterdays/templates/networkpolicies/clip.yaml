@@ -31,6 +31,14 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
+    # Allow connections from background workers
+    - from:
+        - podSelector:
+            matchLabels:
+              app: yesterdays-background-worker
+      ports:
+        - protocol: TCP
+          port: 8000
   egress:
     # Allow DNS resolution. The service makes no other outbound connections —
     # the model is baked into the image, so no egress to R2/HuggingFace.
