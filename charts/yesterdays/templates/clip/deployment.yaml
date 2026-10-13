@@ -5,6 +5,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.clip.replicaCount }}
+  # Recreate by default to preserve GPU memory when rolling out new version
+  strategy:
+    type: {{ .Values.clip.strategy }}
   selector:
     matchLabels:
       app: yesterdays-clip
@@ -38,12 +41,14 @@ spec:
               drop:
                 - ALL
           env:
-            # The text tower always runs on CPU so query vectors match across
-            # GPU and CPU-only deployments; the vision tower follows visionDevice.
+            # OpenVINO device per tower (CPU, GPU or AUTO), and the inference
+            # precision (f16/f32; empty = f16 on GPU, f32 on CPU).
             - name: CLIP_TEXT_DEVICE
               value: {{ .Values.clip.textDevice | quote }}
             - name: CLIP_VISION_DEVICE
               value: {{ .Values.clip.visionDevice | quote }}
+            - name: CLIP_INFERENCE_PRECISION
+              value: {{ .Values.clip.inferencePrecision | quote }}
             # OpenVINO compiled-kernel cache lives on the tmp emptyDir (the
             # root filesystem is read-only). Hardware-specific, so never baked
             # into the image.

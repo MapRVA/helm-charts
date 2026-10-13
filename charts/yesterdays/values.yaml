@@ -1,5 +1,5 @@
 frontend:
-  image: ghcr.io/maprva/yesterdays:600bec8
+  image: ghcr.io/maprva/yesterdays:d37d2bd
   pullPolicy: IfNotPresent
   replicaCount: 3
   resources:
@@ -160,14 +160,22 @@ yesterdays:
 # CLIP embedding microservice (semantic search). Required by the app; the
 # model is baked into the image, so no weights download or PVC is needed.
 clip:
-  image: ghcr.io/maprva/yesterdays-clip:7ac0900
+  image: ghcr.io/maprva/yesterdays-clip:d37d2bd
   pullPolicy: IfNotPresent
   replicaCount: 1
 
-  # OpenVINO device selection per tower. AUTO picks GPU when present
-  # (Intel-only for now via the intel-device-plugins operator)
+  # OpenVINO device selection per tower: CPU, GPU, or AUTO (GPU when
+  # present; Intel-only for now via the intel-device-plugins operator).
   textDevice: AUTO
   visionDevice: AUTO
+  # Inference precision for both towers: f16 or f32. Empty picks per device:
+  # f16 on GPU, f32 on CPU. fp16 is comparable in terms of search quality.
+  inferencePrecision: ""
+
+  # Deployment strategy. Recreate keeps two pods from ever holding the model
+  # at once, which a shared, memory-unisolated GPU requires; RollingUpdate is
+  # fine for CPU-only deployments that want zero downtime.
+  strategy: Recreate
 
   # Intel GPU acceleration via the intel-device-plugins operator. Leave
   # disabled for CPU-only inference.
@@ -184,13 +192,16 @@ clip:
   # i915 resource already constrains scheduling; use this for finer control.
   nodeSelector: {}
 
+  # Memory covers the CPU fp32 path, the larger one: OpenVINO expands the
+  # bundle's fp16 weights (PE-Core L/14) to fp32 in host memory. Measured RSS
+  # ~4.9 GiB (3.5 GiB anonymous + 1.35 GiB of mmapped .bin files).
   resources:
     requests:
       cpu: 500m
-      memory: 2Gi
+      memory: 5Gi
     limits:
       cpu: "2"
-      memory: 4Gi
+      memory: 7Gi
 
 # Bolt client settings for the app's connection to Memgraph, which holds the
 # Wikidata subject mirror. The Memgraph server itself is configured under
