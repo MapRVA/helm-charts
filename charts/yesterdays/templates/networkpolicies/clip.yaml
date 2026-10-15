@@ -39,6 +39,17 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
+    {{- if .Values.metrics.enabled }}
+    # Allow Prometheus to scrape metrics (served on the API port)
+    - from:
+        - namespaceSelector:
+            {{- toYaml .Values.metrics.networkPolicy.namespaceSelector | nindent 12 }}
+          podSelector:
+            {{- toYaml .Values.metrics.networkPolicy.podSelector | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 8000
+    {{- end }}
   egress:
     # Allow DNS resolution. The service makes no other outbound connections —
     # the model is baked into the image, so no egress to R2/HuggingFace.
