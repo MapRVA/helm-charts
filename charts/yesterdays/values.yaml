@@ -160,7 +160,7 @@ yesterdays:
 # CLIP embedding microservice (semantic search). Required by the app; the
 # model is baked into the image, so no weights download or PVC is needed.
 clip:
-  image: ghcr.io/maprva/yesterdays-clip:d37d2bd
+  image: ghcr.io/maprva/yesterdays-clip:2fe5068
   pullPolicy: IfNotPresent
   replicaCount: 1
 
@@ -171,6 +171,13 @@ clip:
   # Inference precision for both towers: f16 or f32. Empty picks per device:
   # f16 on GPU, f32 on CPU. fp16 is comparable in terms of search quality.
   inferencePrecision: ""
+  # Inference threads per tower on CPU, with CPU pinning off. Set this to
+  # resources.limits.cpu: left empty, OpenVINO sizes its pool from the node's
+  # CPUs and ignores the limit, so the pod is heavily throttled under load.
+  inferenceThreads: ""
+  # Caps glibc malloc arenas. Inference runs one request at a time per tower,
+  # so more arenas add little beyond memory held by the process.
+  mallocArenaMax: 2
 
   # Deployment strategy. Recreate keeps two pods from ever holding the model
   # at once, which a shared, memory-unisolated GPU requires; RollingUpdate is

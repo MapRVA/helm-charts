@@ -49,6 +49,11 @@ spec:
               value: {{ .Values.clip.visionDevice | quote }}
             - name: CLIP_INFERENCE_PRECISION
               value: {{ .Values.clip.inferencePrecision | quote }}
+            # Inference threads on CPU; empty leaves it to OpenVINO.
+            - name: CLIP_INFERENCE_THREADS
+              value: {{ .Values.clip.inferenceThreads | quote }}
+            - name: MALLOC_ARENA_MAX
+              value: {{ .Values.clip.mallocArenaMax | quote }}
             # OpenVINO compiled-kernel cache lives on the tmp emptyDir (the
             # root filesystem is read-only). Hardware-specific, so never baked
             # into the image.
