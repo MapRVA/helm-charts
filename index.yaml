@@ -3,6 +3,20 @@ entries:
   georeference-tool:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-11-12T18:55:51.431218611Z"
+    dependencies:
+    - name: memgraph
+      repository: https://memgraph.github.io/helm-charts
+      version: 1.0.5
+    description: A Helm chart for Yesterdays
+    digest: a3e4b7eb0084e7737f2bf07d997fe115824db786b16d1a5380bec9616fcaa1a0
+    name: georeference-tool
+    type: application
+    urls:
+    - https://github.com/MapRVA/helm-charts/releases/download/georeference-tool-5.6.1/georeference-tool-5.6.1.tgz
+    version: 5.6.1
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-11-10T22:42:06.300374991Z"
     dependencies:
     - name: memgraph
@@ -3997,4 +4011,4 @@ entries:
     urls:
     - https://github.com/MapRVA/helm-charts/releases/download/yesterdays-2.5.8/yesterdays-2.5.8.tgz
     version: 2.5.8
-generated: "2026-11-10T22:42:06.301121734Z"
+generated: "2026-11-12T18:55:51.432266435Z"
